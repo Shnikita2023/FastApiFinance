@@ -1,0 +1,44 @@
+version: '3.9'
+
+services:
+
+  db:
+    image: postgres
+    restart: always
+    container_name: db
+    environment:
+      POSTGRES_DB: "finance"
+      POSTGRES_USER: "admin"
+      POSTGRES_PASSWORD: "admin"
+    ports:
+      - "5439:5432"
+
+
+
+#  redis:
+#    image: redis
+#    restart: always
+#    container_name: redis_app
+#    command: -p 5436
+#    expose:
+#      - 5436
+#
+#
+#  api:
+#    restart: always
+#    build:
+#      context: .
+#    env_file:
+#      - .env-non-dev
+#    container_name: fastapi_app
+#
+#    command:
+#      - bash -c " uvicorn src.app:app --reload
+#    ports:
+#      - 8001:8000
+#    depends_on:
+#      - db_app
+#      - redis_app
+#
+
+

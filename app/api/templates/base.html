@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Управление финансами</title>
+
+    <!-- Подключаем CSS-файл -->
+    <link rel="stylesheet" href="{{ url_for('static', path='css/base.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Управление финансами</h1>
+        <nav>
+            <ul>
+                <li><button onclick="authenticationUser()" id="myButton">Зарегистрироваться</button></li>
+                <li><button onclick="authorizationUser()">Войти</button></li>
+            </ul>
+        </nav>
+    </header>
+
+<!-- Подключаем JS-файлы -->
+<script src="{{ url_for('static', path='js/auth.js') }}"></script>
+
+</body>
+</html>

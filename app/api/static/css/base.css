@@ -1,0 +1,30 @@
+/* Стили для header */
+header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px;
+    background: #aca9a9;
+  }
+  nav ul {
+    display: flex;
+    justify-content: space-between;
+  }
+  nav li {
+    list-style-type: none;
+    padding: 0 10px;
+  }
+
+
+  main {
+    background: #dddcdc;
+  }
+
+  html {
+    background: #f3f2f2;
+  }
+
+  button {
+    font-size: 25px;
+    background-color: beige;
+  }
