@@ -20,38 +20,18 @@ router_authentic = APIRouter(
     tags=["Authentication"]
 )
 
-@router_register.get("/", response_class=HTMLResponse)
-async def register_user(request: Request):
-    return templates.TemplateResponse("register.html", {"request": request})
-
 
 @router_register.get("/", response_class=HTMLResponse)
 async def register_user(request: Request):
     return templates.TemplateResponse("register.html", {"request": request})
+
 
 @router_authentic.get("/", response_class=HTMLResponse)
 async def register_user(request: Request):
     return templates.TemplateResponse("authentic.html", {"request": request})
 
 
-# HTTP POST маршрут для обработки отправленной формы регистрации
-# @router_register.post("/")
-# async def register_post(request: Request, user: UserCreate):
-#     # Создаем нового пользователя
-#     user_db_user = await fastapi_users.create_user(user)
-#     # Возвращаем сообщение об успешной регистрации пользователю
-#     return templates.TemplateResponse("base.html", {"request": request, "user": user_db_user})
-
-# @router_register.post("/")
-# async def register_user(request: Request, email: str = Form(...),
-#                         password: str = Form(...), username: str = Form(...), last_name: str = Form(...),
-#                         first_name: str = Form(...)):
-#     user_data = {
-#         "email": email,
-#         "password": password,
-#         "username": username,
-#         "last_name": last_name,
-#         "first_name": first_name,
-#     }
-#     print(user_data)
+@router_authentic.get("/cabinet", response_class=HTMLResponse)
+async def register_user(request: Request):
+    return templates.TemplateResponse("base_cabinet.html", {"request": request})
 

@@ -1,14 +1,9 @@
 // Получаем форму по id
-const form = document.getElementById("myform");
+const form = document.getElementById("form_register");
 
 
 form.addEventListener('submit', event => {
   event.preventDefault();  // отменяем стандартное поведение формы
-
-// Определяем функцию для обработки отправки формы
-//const handleSubmit = (event) => {
-//  // Не отправляем форму стандартным способом
-//  event.preventDefault();
 
   // Получаем данные формы
   const formData = new FormData(event.target);
@@ -29,17 +24,20 @@ form.addEventListener('submit', event => {
     },
     body: JSON.stringify(data)
   })
-  .then(response => response.json())
+  .then(response => {
+    if (!response.ok) {  // если ответ содержит ошибку
+          throw new Error('Ошибка запроса');
+    }
+    return response.json()
+  })
   .then(json => {
     const successMessage = document.createElement('p');
             successMessage.innerHTML = 'Вы успешно зарегистрированы!';
             form.appendChild(successMessage);
             setTimeout(() => {
                 window.location.href = '/base'; // Переход на другую страницу
-            }, 5000); // Ждем 3 секунды, прежде чем перенаправить пользователя
+            }, 5000); // Ждем 5 секунды, прежде чем перенаправить пользователя
         })
-    .catch(error => console.error(error));
-        // В случае ошибки выводим сообщение в консоль
-  });
+  .catch(error => console.log(`Ошибка: ${error}`))
 
-
+});

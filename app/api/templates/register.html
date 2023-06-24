@@ -1,32 +1,28 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Управление финансами</title>
+{% extends "base.html" %}
 
-    <!-- Подключаем CSS-файл -->
-    <link rel="stylesheet" href="{{ url_for('static', path='css/style.css') }}">
-</head>
-<body>
-    <main>
-        <form id="myform">
-            <h1>Регистрация</h1>
-            <input type="email" name="email" placeholder="Email">
-            <input type="password" name="password" placeholder="Password">
-            <input type="text" name="username" placeholder="Username">
-            <input type="text" name="last_name" placeholder="Lastname">
-            <input type="text" name="first_name" placeholder="Firstname">
-            <button type="submit">Зарегистрироваться</button>
-        </form>
-        <div id="myModal" class="modal">
-            <div class="modal-content">
-                <span class="close">&times;</span>
-                <p>Вы успешно зарегистрировались!</p>
-            </div>
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', path='css/style.css') }}">
+{% endblock %}
+
+{% block content %}
+<main>
+    <form id="form_register">
+        <h1>Регистрация</h1>
+        <input type="email" name="email" placeholder="Email">
+        <input type="password" name="password" placeholder="Password">
+        <input type="text" name="username" placeholder="Username">
+        <input type="text" name="last_name" placeholder="Lastname">
+        <input type="text" name="first_name" placeholder="Firstname">
+        <button type="submit">Зарегистрироваться</button>
+    </form>
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <p>Вы успешно зарегистрировались!</p>
         </div>
-    </main>
+    </div>
+</main>
 
 <!-- Подключаем JS-файлы -->
-<!--    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>-->
 <script src="{{ url_for('static', path='js/register.js') }}"></script>
-</body>
-</html>
+{% endblock %}

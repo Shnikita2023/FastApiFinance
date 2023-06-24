@@ -2,11 +2,14 @@
 <html>
 <head>
     <title>Управление финансами</title>
-
+    {% block head %}
     <!-- Подключаем CSS-файл -->
     <link rel="stylesheet" href="{{ url_for('static', path='css/base.css') }}">
+    {% endblock %}
 </head>
+
 <body>
+{% block content %}
     <header>
         <h1>Управление финансами</h1>
         <nav>
@@ -19,6 +22,6 @@
 
 <!-- Подключаем JS-файлы -->
 <script src="{{ url_for('static', path='js/auth.js') }}"></script>
-
+{% endblock %}
 </body>
 </html>
