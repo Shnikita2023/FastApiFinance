@@ -1,5 +1,5 @@
-/* Стили для header */
-header {
+  /* Стили для header */
+  header {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -27,4 +27,26 @@ header {
   button {
     font-size: 25px;
     background-color: beige;
+  }
+
+
+  /* Стили для формы */
+  form {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    width: 50%;
+  }
+  form div {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  form label {
+    margin-right: 10px;
+  }
+  form input,
+  form select {
+    flex: 1;
+    padding: 5px;
   }

@@ -13,3 +13,6 @@ class Income(Base):
 
     user_id = Column(Integer, ForeignKey('users.id'))
     user = relationship('User', back_populates='incomes')
+
+    category_id = Column(Integer, ForeignKey('categories.id'))
+    category = relationship('Category', back_populates='incomes')

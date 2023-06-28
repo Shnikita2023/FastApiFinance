@@ -8,6 +8,4 @@ const authorizationUser = () => {
         };
 
 
-const logoutUser = () => {
-            window.location.href = 'https://www.youtube.com'
-        };
+

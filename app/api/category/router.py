@@ -16,10 +16,11 @@ router_categories = APIRouter(
 
 
 @router_categories.get("/", summary='Получение категории', response_model=CategoryGet)
-async def get_category(category_id: int, session: AsyncSession = Depends(get_async_session)):
+async def get_category(category_name: str, session: AsyncSession = Depends(get_async_session)):
     try:
-        result = await session.get(Category, category_id)
-        return result
+        query = select(Category).where(Category.name == category_name)
+        result = await session.execute(query)
+        return result.scalar_one()
 
     except Exception:
         raise HTTPException(status_code=500, detail={

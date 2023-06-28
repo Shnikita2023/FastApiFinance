@@ -1,10 +1,9 @@
-from fastapi import APIRouter, Depends, HTTPException, Form, Request
-from sqlalchemy import insert, select, delete
-from sqlalchemy.ext.asyncio import AsyncSession
+from fastapi import APIRouter, Depends, Request
 from starlette.templating import Jinja2Templates
-from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi.responses import HTMLResponse
 
-from app.api.auth.base import fastapi_users
+from app.api.auth.base import fastapi_users, current_user
+from app.api.users import User
 from app.api.users.shemas import UserCreate
 from app.db.database import get_async_session
 
@@ -21,17 +20,20 @@ router_authentic = APIRouter(
 )
 
 
-@router_register.get("/", response_class=HTMLResponse)
+@router_register.get("/", response_class=HTMLResponse, summary="Шаблон регистрации")
 async def register_user(request: Request):
     return templates.TemplateResponse("register.html", {"request": request})
 
 
-@router_authentic.get("/", response_class=HTMLResponse)
+@router_authentic.get("/", response_class=HTMLResponse, summary="Шаблон аутентификации")
 async def register_user(request: Request):
     return templates.TemplateResponse("authentic.html", {"request": request})
 
 
-@router_authentic.get("/cabinet", response_class=HTMLResponse)
-async def register_user(request: Request):
+@router_authentic.get("/cabinet", response_class=HTMLResponse, summary="Шаблон кабинета авторизованного user")
+async def register_user(request: Request, user: User = Depends(current_user)):
     return templates.TemplateResponse("base_cabinet.html", {"request": request})
 
+@router_authentic.get("/me", summary="Получение профиля user")
+async def get_user_me(user: User = Depends(current_user)):
+    return user

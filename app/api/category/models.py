@@ -15,3 +15,4 @@ class Category(Base):
     updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now())
 
     expenses = relationship('Expense', back_populates='category')
+    incomes = relationship('Income', back_populates='category')
