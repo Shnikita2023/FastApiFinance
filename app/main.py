@@ -13,6 +13,7 @@ from starlette.templating import Jinja2Templates
 from app.api.auth.base import auth_backend, fastapi_users, current_user
 from app.api.category.router import router_categories
 from app.api.expenses.router import router_expenses
+from app.api.incomes.router import router_incomes
 from app.api.users import User
 from app.api.users.router import router_register, router_authentic
 from app.api.users.shemas import UserRead, UserCreate
@@ -48,6 +49,8 @@ app.include_router(router_categories)
 app.include_router(router_register)
 app.include_router(router_authentic)
 app.include_router(router_expenses)
+app.include_router(router_incomes)
+
 
 
 

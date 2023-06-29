@@ -52,7 +52,7 @@ async def formation_expenses(data_form: dict, user: User = Depends(current_user)
         )
         async with AsyncClient() as client:
             URL = "http://localhost:8000/"
-            if data_form["type"] == "Расход":
+            if data_form["type"] == "expense":
                 slug = "expense/add"
             else:
                 slug = "income/add"

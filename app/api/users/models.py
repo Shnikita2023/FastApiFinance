@@ -2,6 +2,7 @@ from sqlalchemy import Column, Integer, String, TIMESTAMP, Boolean
 
 from app.api.expenses.models import Expense
 from app.api.incomes.models import Income
+from app.api.balance.models import Balance
 from app.db.database import Base
 from sqlalchemy.orm import relationship
 from datetime import datetime
@@ -25,3 +26,4 @@ class User(SQLAlchemyBaseUserTable[int], Base):
 
     expenses = relationship('Expense', back_populates='user')
     incomes = relationship('Income', back_populates='user')
+    balance = relationship("Balance", back_populates='user', uselist=False)

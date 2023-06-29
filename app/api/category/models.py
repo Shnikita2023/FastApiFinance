@@ -16,3 +16,4 @@ class Category(Base):
 
     expenses = relationship('Expense', back_populates='category')
     incomes = relationship('Income', back_populates='category')
+    transactions = relationship('Transaction', back_populates='category')
