@@ -1,3 +1,4 @@
 /.env
 /venv/
 /.env-non-dev
+.pytest_cache

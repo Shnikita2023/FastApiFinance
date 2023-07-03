@@ -10,8 +10,8 @@ import sys
 from app.config import DB_USER, DB_PASS, DB_HOST, DB_PORT, DB_NAME
 from app.db.database import Base
 from app.api.category.models import *
-from app.api.expenses.models import *
-from app.api.incomes.models import *
+from app.api.balance.models import *
+from app.api.transaction.models import *
 from app.api.users.models import *
 
 sys.path.append(os.path.join(sys.path[0], 'src'))

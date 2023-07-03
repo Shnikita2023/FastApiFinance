@@ -1,4 +1,5 @@
 from typing import AsyncGenerator
+
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy.orm import sessionmaker
@@ -10,7 +11,6 @@ DATABASE_URL = f"postgresql+asyncpg://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{D
 
 class Base(DeclarativeBase):
     pass
-
 
 
 engine = create_async_engine(DATABASE_URL)

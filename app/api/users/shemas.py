@@ -7,10 +7,10 @@ from pydantic import Field
 
 class UserRead(schemas.BaseUser[int]):
     id: int
-    email: str
-    username: str
-    last_name: str
-    first_name: str
+    email: str = Field(max_length=50)
+    username: str = Field(max_length=50)
+    last_name: str = Field(max_length=50)
+    first_name: str = Field(max_length=50)
     registered_at: datetime
     is_active: bool = True
     is_superuser: bool = False

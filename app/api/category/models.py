@@ -14,6 +14,6 @@ class Category(Base):
     created_at = Column(DateTime, server_default=func.now())
     updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now())
 
-    expenses = relationship('Expense', back_populates='category')
-    incomes = relationship('Income', back_populates='category')
-    transactions = relationship('Transaction', back_populates='category')
+    # expenses = relationship('Expense', back_populates='category')
+    # incomes = relationship('Income', back_populates='category')
+    transaction = relationship('Transaction', back_populates='category')

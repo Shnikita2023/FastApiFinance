@@ -2,20 +2,39 @@ version: '3.9'
 
 services:
 
-  db:
+  database:
     image: postgres
     restart: always
-    container_name: db
+    container_name: database
     environment:
       POSTGRES_DB: "finance"
       POSTGRES_USER: "admin"
       POSTGRES_PASSWORD: "admin"
     ports:
-      - "5439:5432"
+      - "5438:5432"
+    networks:
+      - custom
+
+  database_test:
+    image: postgres
+    restart: always
+    container_name: database_test
+    environment:
+      POSTGRES_DB: "finance_test"
+      POSTGRES_USER: "admin"
+      POSTGRES_PASSWORD: "admin"
+    ports:
+      - "5440:5432"
+    networks:
+      - custom
+
+networks:
+  custom:
+    driver: bridge
 
 
 
-#  redis:
+       #  redis:
 #    image: redis
 #    restart: always
 #    container_name: redis_app

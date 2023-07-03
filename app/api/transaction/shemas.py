@@ -1,18 +1,18 @@
+from typing import Literal
+
 from pydantic import BaseModel
 from enum import Enum
 
 
-class TypeTranstaction(Enum):
-    INCOME = "Доход"
-    EXPENSE = "Расход"
 
 
 class TransactionCreate(BaseModel):
     comment: str | None = None
     amount: float
-    type_transaction: TypeTranstaction
+    type_transaction: Literal["Доход", "Расход"]
     user_id: int
     category_id: int
+    balance_id: int
 
 
     class Config:

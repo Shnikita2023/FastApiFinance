@@ -26,12 +26,12 @@ async def register_user(request: Request):
 
 
 @router_authentic.get("/", response_class=HTMLResponse, summary="Шаблон аутентификации")
-async def register_user(request: Request):
+async def get_template_authentic(request: Request):
     return templates.TemplateResponse("authentic.html", {"request": request})
 
 
 @router_authentic.get("/cabinet", response_class=HTMLResponse, summary="Шаблон кабинета авторизованного user")
-async def register_user(request: Request, user: User = Depends(current_user)):
+async def get_template_authentic_user(request: Request, user: User = Depends(current_user)):
     return templates.TemplateResponse("base_cabinet.html", {"request": request})
 
 @router_authentic.get("/me", summary="Получение профиля user")

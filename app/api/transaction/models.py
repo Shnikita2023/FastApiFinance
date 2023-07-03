@@ -13,12 +13,10 @@ class Transaction(Base):
     amount = Column(Float, nullable=False)
     type_transaction = Column(String(10), nullable=False)
 
-
-
     user_id = Column(Integer, ForeignKey("users.id"))
     category_id = Column(Integer, ForeignKey("categories.id"))
     balance_id = Column(Integer, ForeignKey('balance.id'))
 
-    user = relationship("User", back_populates="transactions")
-    category = relationship("Category", back_populates="transactions")
-    balance = relationship("Balance", back_populates="transactions")
+    user = relationship("User", back_populates="transaction")
+    category = relationship("Category", back_populates="transaction")
+    balance = relationship("Balance", back_populates="transaction")

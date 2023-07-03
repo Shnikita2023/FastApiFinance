@@ -54,7 +54,7 @@ async def add_category(new_categorie: CategoryCreate, session: AsyncSession = De
         await session.commit()
 
         return {
-            "status": "succeses",
+            "status": "successes",
             "data": f"product {new_categorie.name} added",
             "details": None
         }
@@ -76,7 +76,7 @@ async def delete_categorie(categorie_id: int, session: AsyncSession = Depends(ge
             await session.execute(stmt)
             await session.commit()
             return {
-                "status": "succeses",
+                "status": "successes",
                 "data": f"product {find_category.name} removed",
                 "details": None
             }
