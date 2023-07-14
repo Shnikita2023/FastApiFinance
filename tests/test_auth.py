@@ -1,7 +1,7 @@
 from tests.conftest import client
 
 
-class TestGoodUser:
+class TestPositiveAuth:
 
     async def test_register_user(self) -> None:
         """Регистрация пользователя"""

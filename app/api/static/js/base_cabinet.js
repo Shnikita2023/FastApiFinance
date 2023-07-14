@@ -17,62 +17,96 @@ const logoutUser = () => {
 
 };
 
-// Функция для получение всех категории финансов при загрузке страницы
-document.addEventListener('DOMContentLoaded', () => {
-        const allCategory = document.getElementById('category')
-        fetch('/category/all')
-            .then(response => response.json())
-            .then(categories => {
-                categories.forEach(category => {
-                    const option = document.createElement('option');
-                    option.textContent = category.name
-                    allCategory.appendChild(option)
-                })
-            })
+// Функция выбора категории вкладки "Мой кабинет"
+document.addEventListener('DOMContentLoaded', function() {
+    const accountButton = document.querySelector('.account-button');
+    const dropdownContent = document.querySelector('.dropdown-content');
+
+    accountButton.addEventListener('click', function() {
+        dropdownContent.classList.toggle('show');
+    });
+
+    window.addEventListener('click', function(event) {
+        if (!event.target.matches('.account-button')) {
+            if (dropdownContent.classList.contains('show')) {
+                dropdownContent.classList.remove('show');
+            }
+        }
+    });
 })
 
 
-// Получаем форму по id
-const formFinance = document.getElementById("form_finance");
+// Получение баланса пользователя с БД и вывод на экран
+const myBalance = () => {
+  const balanceDiv = document.getElementById('balanceDiv');
+  if (balanceDiv.style.display === 'none') {
+    balanceDiv.style.display = 'block';
+    axios.get('/balance/')
+          .then(response => {
+            if (response.status == 200) {
+                const balance = response.data.total_balance + 'руб'
+                balanceDiv.textContent = balance;
+            }
+          })
+          .catch(error => {
+            console.log("Ошибка");
+          });
 
-formFinance.addEventListener('submit', event => {
-  event.preventDefault()  // отменяем стандартное поведение формы
+  } else {
+    balanceDiv.style.display = 'none';
+  }
+};
 
-//  async function fetchData(category) {
-//    const response = await fetch('http://127.0.0.1:8000/category/?category_name=' + category)
-//    const data = await response.json()
-//    return data.id
-//
-//  };
 
-  const formData = new FormData(event.target) // Создаём новую форму с помощью метода event
-  const amount = formData.get('amount')
-  const category = formData.get('category')
-  const description = formData.get('description')
-  const type = formData.get('type')
 
-   data_expense = {
-            "amount": amount,
-            "description": description,
-            "type": type,
-            "category": category
-   }
 
-  fetch("http://127.0.0.1:8000/transaction/?category_name=" + category, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify(data_expense)
+// Отправка обновленных данных пользователя
+const editButton = document.querySelector('.edit-button');
+const modal = document.querySelector('#modal');
+const closeButton = document.querySelector('.close');
+const editForm = document.querySelector('#edit-form');
+
+editButton.addEventListener('click', () => {
+    modal.style.display = 'block';
+});
+
+closeButton.addEventListener('click', () => {
+modal.style.display = 'none';
+});
+
+editForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+
+    const firstName = document.querySelector('#first-name').value;
+    const lastName = document.querySelector('#last-name').value;
+    const email = document.querySelector('#email').value;
+    const username = document.querySelector('#username').value;
+
+
+    // Отправка данных в БД
+    fetch('/edit-data', {
+        method: 'POST',
+        headers: {
+        'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+        firstName,
+        lastName,
+        email,
+        username
+        }),
     })
-    .then(response => {
-          if(response.status == 200) {  // если ответ не содержит ошибку
-                console.log(response.json())
-          }
-    })
-    .catch(error => console.log(`Ошибка: ${error}`));
-
-
+        .then((response) => response.json())
+            .then((data) => {
+                console.log('Данные успешно отправлены и сохранены');
+                console.log(data);
+                modal.style.display = 'none';
+            // Дополнительные действия, если требуется после сохранения данных
+            })
+            .catch((error) => {
+                console.error('Ошибка при отправке данных:', error);
+            });
+});
 
 
 
@@ -113,4 +147,3 @@ formFinance.addEventListener('submit', event => {
 //        }
 //  })
 //  .catch(error => console.log(`Ошибка: ${error}`));
-})

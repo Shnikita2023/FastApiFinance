@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', path='css/base.css') }}">
+{% endblock %}
+
+{% block content %}
+
+<header>
+    <h1>Управление финансами</h1>
+    <nav>
+        <div class="dropdown">
+            <button class="account-button">Мой аккаунт</button>
+            <div class="dropdown-content">
+                <a href="/authentic/cabinet">Главная</a>
+                <a href="/category/add_category">Добавить категории финансов</a>
+            </div>
+        </div>
+        <button onclick="logoutUser()">Выйти</button>
+    </nav>
+</header>
+
+<main>
+
+    <div class="container">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Информация</h5>
+                {% for key, value in data_user.items() %}
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item"><strong>{{ key }}: </strong>{{ value }}</li>
+                </ul>
+                {% endfor %}
+                <button class="edit-button">Изменить данные</button>
+                <div id="modal" class="modal">
+                    <div class="modal-content">
+                        <span class="close">&times;</span>
+                        <form id="edit-form">
+                            <label for="first-name">Имя:</label>
+                            <input type="text" id="first-name" name="first-name">
+
+                            <label for="last-name">Фамилия:</label>
+                            <input type="text" id="last-name" name="last-name">
+
+                            <label for="email">Почта:</label>
+                            <input type="email" id="email" name="email">
+
+                            <label for="username">Ваш ник:</label>
+                            <input type="text" id="username" name="username"><br>
+
+                            <button type="submit">Сохранить</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</main>
+
+<script src="{{ url_for('static', path='js/base_cabinet.js') }}"></script>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+{% endblock %}

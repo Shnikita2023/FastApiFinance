@@ -26,7 +26,11 @@ form.addEventListener('submit', event => {
   })
   .then(response => {
     if (!response.ok) {  // если ответ содержит ошибку
-          throw new Error('Ошибка запроса');
+          response.json()
+            .then(data => {
+                const errorMessage = data.detail
+                alert(errorMessage)
+            })
     }
     return response.json()
   })
@@ -38,6 +42,5 @@ form.addEventListener('submit', event => {
                 window.location.href = '/base'; // Переход на другую страницу
             }, 5000); // Ждем 5 секунды, прежде чем перенаправить пользователя
         })
-  .catch(error => console.log(`Ошибка: ${error}`))
-
+  .catch((error) => console.log(`Ошибка запроса: ${error}`));
 });

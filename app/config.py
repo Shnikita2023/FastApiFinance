@@ -21,3 +21,5 @@ SMTP_HOST = os.environ.get("SMTP_HOST")
 SMTP_PORT = os.environ.get("SMTP_PORT")
 
 SECRET_AUTH = os.environ.get("SECRET_AUTH")
+SECRET_AUTH_RESET = os.environ.get("SECRET_AUTH_RESET")
+SECRET_AUTH_VERIF_TOKEN = os.environ.get("SECRET_AUTH_VERIF_TOKEN")

@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', path='css/base.css') }}">
+{% endblock %}
+
+{% block content %}
+
+<header>
+  <h1>Управление финансами</h1>
+  <nav>
+    <div class="dropdown">
+      <button class="account-button">Мой аккаунт</button>
+      <div class="dropdown-content">
+        <a href="/authentic/cabinet/get_data_user">Данные профиля</a>
+        <a href="/authentic/cabinet">Главная</a>
+      </div>
+    </div>
+    <button onclick="logoutUser()">Выйти</button>
+  </nav>
+</header>
+
+<main>
+  <form id="form_category">
+    <h2>Добавить категорию</h2>
+    <div>
+      <label for="name">Имя категории:</label>
+      <input type="text" id="name" name="name" required>
+    </div>
+    <div>
+      <label for="description">Описание:</label>
+      <input type="text" id="description" name="description" required>
+    </div>
+    <button type="submit">Добавить</button>
+  </form>
+</main>
+
+<!-- Подключаем JS-файлы -->
+<script src="{{ url_for('static', path='js/base_cabinet.js') }}"></script>
+<script src="{{ url_for('static', path='js/category.js') }}"></script>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+{% endblock %}

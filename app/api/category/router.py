@@ -1,6 +1,8 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy import insert, select, delete
 from sqlalchemy.ext.asyncio import AsyncSession
+from starlette.responses import HTMLResponse
+from starlette.templating import Jinja2Templates
 
 from .models import Category
 from .shemas import CategoryGet, CategoryCreate
@@ -8,6 +10,9 @@ from .shemas import CategoryGet, CategoryCreate
 from app.db.database import get_async_session
 from ..auth.base import current_user
 from ..users import User
+
+
+templates = Jinja2Templates(directory="app/api/templates")
 
 router_categories = APIRouter(
     prefix="/category",
@@ -89,3 +94,8 @@ async def delete_categorie(categorie_id: int, session: AsyncSession = Depends(ge
             "data": None,
             "details": None
         })
+
+
+@router_categories.get("/add_category", response_class=HTMLResponse, summary="Шаблон для добавление категорий")
+async def add_category(request: Request, user: User = Depends(current_user)):
+    return templates.TemplateResponse("category.html", {"request": request})

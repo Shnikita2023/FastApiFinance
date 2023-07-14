@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', path='css/style.css') }}">
+{% endblock %}
+
+{% block content %}
+<main>
+  <form id="form_forgot">
+    <h1>Введите ваш email</h1>
+    <input type="email" name="email" placeholder="Email">
+    <input type="submit" value="Восстановить">
+  </form>
+</main>
+<!-- Подключаем JS-файлы -->
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script src="{{ url_for('static', path='js/forgot_password.js') }}"></script>
+{% endblock %}

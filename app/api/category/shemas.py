@@ -16,4 +16,3 @@ class CategoryGet(CategoryCreate):
     id: int
 
 
-

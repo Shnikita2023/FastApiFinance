@@ -8,11 +8,17 @@
 
 <header>
   <h1>Управление финансами</h1>
+  <button id="balanceBtn" onclick="myBalance()">Показать баланс</button>
+  <div id="balanceDiv" style="display: none"></div>
   <nav>
-    <ul>
-      <li><button onclick="myAccount()">Мой аккаунт</button></li>
-      <li><button onclick="logoutUser()">Выйти</button></li>
-    </ul>
+    <div class="dropdown">
+      <button class="account-button">Мой аккаунт</button>
+      <div class="dropdown-content">
+        <a href="/authentic/cabinet/get_data_user">Данные профиля</a>
+        <a href="/category/add_category">Добавить категории финансов</a>
+      </div>
+    </div>
+    <button onclick="logoutUser()">Выйти</button>
   </nav>
 </header>
 
@@ -47,5 +53,7 @@
 
 <!-- Подключаем JS-файлы -->
 <script src="{{ url_for('static', path='js/base_cabinet.js') }}"></script>
+<script src="{{ url_for('static', path='js/transaction.js') }}"></script>
+<script src="{{ url_for('static', path='js/category.js') }}"></script>
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 {% endblock %}

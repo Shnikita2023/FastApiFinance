@@ -11,7 +11,7 @@ from app.api.balance.router import router_balance
 from app.api.category.router import router_categories
 from app.api.transaction.router import router_transaction
 from app.api.users.router import router_register, router_authentic
-from app.api.users.shemas import UserRead, UserCreate
+from app.api.users.shemas import UserRead, UserCreate, UserUpdate
 
 app = FastAPI()
 
@@ -38,6 +38,22 @@ app.include_router(
     fastapi_users.get_register_router(UserRead, UserCreate),
     prefix="/auth",
     tags=["Auth"],
+)
+
+app.include_router(
+    fastapi_users.get_reset_password_router(),
+    prefix="/auth",
+    tags=["Auth"],
+)
+app.include_router(
+    fastapi_users.get_verify_router(UserRead),
+    prefix="/auth",
+    tags=["Auth"],
+)
+app.include_router(
+    fastapi_users.get_users_router(UserRead, UserUpdate),
+    prefix="/users",
+    tags=["users"],
 )
 
 app.include_router(router_categories)
@@ -68,3 +84,6 @@ app.add_middleware(
 #     redis = aioredis.from_url("redis://localhost", encoding="utf8", decode_responses=True)
 #     FastAPICache.init(RedisBackend(redis), prefix="fastapi-cache")
 
+if __name__ == '__main__':
+    import uvicorn
+    uvicorn.run(app)
