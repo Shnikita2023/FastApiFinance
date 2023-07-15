@@ -3,10 +3,11 @@ from datetime import datetime
 from typing import Optional
 
 from fastapi import HTTPException
-from fastapi_users import schemas, InvalidPasswordException
+from fastapi_users import schemas
 from pydantic import BaseSettings, validator, Field, EmailStr
 
 PATTERN = r"^[А-ЯЁ][а-яё]+$|^[A-Z][a-z]+$"
+
 
 class UserRead(schemas.BaseUser[int]):
     id: int
@@ -43,11 +44,9 @@ class UserCreate(schemas.BaseUserCreate):
         if not any(c.isupper() for c in password):
             raise HTTPException(status_code=400, detail="В пароли должна быть хотя бы одна заглавная буква")
 
-
         # Проверка на наличие хотя бы одной строчной буквы
         if not any(c.islower() for c in password):
             raise HTTPException(status_code=400, detail="В пароли должна быть хотя бы одна строчная буква")
-
 
         # Проверка на наличие хотя бы одной цифры
         if not any(c.isdigit() for c in password):
@@ -55,18 +54,18 @@ class UserCreate(schemas.BaseUserCreate):
 
         # Проверка на наличие хотя бы одного специального символа
         if not re.search(r'[!@#$%^&*()\-_=+{};:,<.>|\[\]\\\/?]', password):
-            raise HTTPException(status_code=400, detail="В пароли должен быть хотя бы один символ: !@#$%^&*{}()\-_=+;:,<.>|\[\]\\\/?")
+            raise HTTPException(status_code=400,
+                                detail="В пароли должен быть хотя бы один символ: !@#$%^&*{}()\-_=+;:,<.>|\[\]\\\/?")
 
         return password
 
-    @validator("last_name")
-    def check_last_name(cls, last_name):
-        if not re.match(PATTERN, last_name):
-            raise HTTPException(status_code=400, detail="Имя должно быть ru/en и начинаться с большой буквы, затем строчные")
-        return last_name
+    @validator("first_name")
+    def check_last_name(cls, first_name):
+        if not re.match(PATTERN, first_name):
+            raise HTTPException(status_code=400,
+                                detail="Поля с именем должно быть ru/en и начинаться с большой буквы, затем строчные")
+        return first_name
 
 
-class UserUpdate(schemas.BaseUserUpdate):
+class UserUpdate(UserCreate):
     pass
-
-

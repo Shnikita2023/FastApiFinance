@@ -39,10 +39,10 @@ async def get_template_authentic_user(request: Request, user: User = Depends(cur
 async def get_data_user(request: Request, user: User = Depends(current_user)) -> Any:
     data_user = {
         "Почта": user.email,
-        "Пароль": "***********",
+        "Пароль": "*********",
         "Имя": user.first_name,
         "Фамилия": user.last_name,
-        "Ваш ник": user.username,
+        "Никнейм": user.username,
         "Дата регистрации": user.registered_at,
     }
     return templates.TemplateResponse("get_data_user.html", {"request": request, "data_user": data_user})

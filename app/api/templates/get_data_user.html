@@ -7,7 +7,7 @@
 {% block content %}
 
 <header>
-    <h1>Управление финансами</h1>
+    <h1>Управление финансами</h1><
     <nav>
         <div class="dropdown">
             <button class="account-button">Мой аккаунт</button>
@@ -37,16 +37,19 @@
                         <span class="close">&times;</span>
                         <form id="edit-form">
                             <label for="first-name">Имя:</label>
-                            <input type="text" id="first-name" name="first-name">
+                            <input type="text" id="first-name" name="first-name" value="{{ data_user.Имя }}">
 
                             <label for="last-name">Фамилия:</label>
-                            <input type="text" id="last-name" name="last-name">
+                            <input type="text" id="last-name" name="last-name" value="{{ data_user.Фамилия }}">
 
                             <label for="email">Почта:</label>
-                            <input type="email" id="email" name="email">
+                            <input type="email" id="email" name="email" value="{{ data_user.Почта }}">
 
-                            <label for="username">Ваш ник:</label>
-                            <input type="text" id="username" name="username"><br>
+                            <label for="username">Никнейм:</label>
+                            <input type="text" id="username" name="username" value="{{ data_user.Никнейм }}"><br>
+
+                            <label for="password">Пароль:</label>
+                            <input type=password id="password" name="password" value="{{ data_user.Пароль }}"><br>
 
                             <button type="submit">Сохранить</button>
                         </form>

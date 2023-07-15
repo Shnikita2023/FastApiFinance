@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends, Body, Request, HTTPException
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 
 
@@ -6,12 +6,12 @@ from starlette.responses import HTMLResponse
 from starlette.staticfiles import StaticFiles
 from starlette.templating import Jinja2Templates
 
-from app.api.auth.base import auth_backend, fastapi_users
-from app.api.balance.router import router_balance
-from app.api.category.router import router_categories
-from app.api.transaction.router import router_transaction
-from app.api.users.router import router_register, router_authentic
-from app.api.users.shemas import UserRead, UserCreate, UserUpdate
+from .api.auth import auth_backend, fastapi_users
+from .api.balance.router import router_balance
+from .api.category.router import router_categories
+from .api.transaction.router import router_transaction
+from .api.users.router import router_register, router_authentic
+from .api.users.shemas import UserRead, UserCreate, UserUpdate
 
 app = FastAPI()
 

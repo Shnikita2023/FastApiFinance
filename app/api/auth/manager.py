@@ -3,10 +3,11 @@ from typing import Optional, Any, Union
 from fastapi import Depends, Request, HTTPException
 from fastapi_users import BaseUserManager, IntegerIDMixin, models, schemas
 
+from app.api.balance.router import create_balance_user
 from app.api.users import User
 from app.api.users.shemas import UserCreate
 from app.api.utils import get_user_db
-from app.api.utils.send_password_reset_email import send_password_reset_email
+from app.api.utils.send_letter_on_email import send_password_reset_email, send_letter_on_after_register
 
 from app.config import SECRET_AUTH_RESET, SECRET_AUTH_VERIF_TOKEN
 
@@ -20,12 +21,13 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
             user_create: schemas.UC,
             safe: bool = False,
             request: Optional[Request] = None,
+            balance_user: Depends = Depends(create_balance_user),
     ) -> models.UP:
         await self.validate_password(user_create.password, user_create)
 
         existing_user = await self.user_db.get_by_email(user_create.email)
         if existing_user is not None:
-            raise HTTPException(status_code=400, detail="Пользователь с такими email уже зарегистрирован")
+            raise HTTPException(status_code=400, detail="Пользователь с таким email уже зарегистрирован")
 
         user_dict = (
             user_create.create_update_dict()
@@ -34,20 +36,27 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
         )
         password = user_dict.pop("password")
         user_dict["hashed_password"] = self.password_helper.hash(password)
+        print(user_dict)
 
         created_user = await self.user_db.create(user_dict)
+        print(created_user)
+        # await balance_user()
 
         await self.on_after_register(created_user, request)
 
         return created_user
 
-    async def get_by_email(self, user_email: str) -> models.UP:
-        """Проверка email и генерации кастомный ошибки"""
-        user = await self.user_db.get_by_email(user_email)
+    async def on_after_register(self, user: models.UP, request: Optional[Request] = None) -> None:
+        await send_letter_on_after_register(user.email)
 
-        if user is None:
-            raise HTTPException(status_code=400, detail="Email don't found")
-        return user
+
+    # async def get_by_email(self, user_email: str) -> models.UP:
+    #     """Проверка email и генерации кастомный ошибки"""
+    #     user = await self.user_db.get_by_email(user_email)
+    #
+    #     if user is None:
+    #         raise HTTPException(status_code=400, detail="Email don't found")
+    #     return user
 
     async def on_after_forgot_password(self, user: User, token: str, request: Optional[Request] = None) -> None:
         await send_password_reset_email(email=user.email, token=token)
@@ -59,8 +68,11 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
 
     async def on_after_reset_password(self, user: User, request: Optional[Request] = None) -> None:
         print("Пароль сброшен")
+
     async def on_after_request_verify(self, user: User, token: str, request: Optional[Request] = None):
         print(f"Verification requested for user {user.id}. Verification token: {token}")
+
+
 
 
 async def get_user_manager(user_db=Depends(get_user_db)) -> Any:

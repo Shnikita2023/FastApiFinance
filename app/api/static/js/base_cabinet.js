@@ -80,32 +80,39 @@ editForm.addEventListener('submit', (e) => {
     const firstName = document.querySelector('#first-name').value;
     const lastName = document.querySelector('#last-name').value;
     const email = document.querySelector('#email').value;
-    const username = document.querySelector('#username').value;
+    const userName = document.querySelector('#username').value;
+    const password = document.querySelector('#password').value;
 
+    const newDataUser = {
+              "email": email,
+              "password": password,
+              "username": userName,
+              "last_name": lastName,
+              "first_name": firstName,
+    }
 
-    // Отправка данных в БД
-    fetch('/edit-data', {
-        method: 'POST',
-        headers: {
-        'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-        firstName,
-        lastName,
-        email,
-        username
-        }),
+    // Отправка обновлённых данных в БД
+    fetch('http://127.0.0.1:8000/users/me', {
+        method: 'PATCH',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(newDataUser),
     })
-        .then((response) => response.json())
-            .then((data) => {
-                console.log('Данные успешно отправлены и сохранены');
-                console.log(data);
-                modal.style.display = 'none';
-            // Дополнительные действия, если требуется после сохранения данных
-            })
-            .catch((error) => {
+        .then((response) => {
+             if(response.status == 200) {  // если ответ не содержит ошибку
+                   alert('Данные успешно отправлены и сохранены')
+                   modal.style.display = 'none';
+             } else {
+                    console.log(response)
+                    response.json()
+                       .then(data => {
+                             const errorMessage = data.detail
+                             alert(errorMessage)
+                       })
+             }
+        })
+       .catch((error) => {
                 console.error('Ошибка при отправке данных:', error);
-            });
+       });
 });
 
 

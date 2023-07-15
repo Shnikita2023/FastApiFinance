@@ -2,7 +2,7 @@ from fastapi_users import FastAPIUsers
 from fastapi_users.authentication import CookieTransport, AuthenticationBackend
 from fastapi_users.authentication import JWTStrategy
 
-from .manager import get_user_manager
+from app.api.auth.manager import get_user_manager
 from app.api.users import User
 from app.config import SECRET_AUTH
 

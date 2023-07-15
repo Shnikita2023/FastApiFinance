@@ -1,11 +1,9 @@
 from datetime import datetime
 
 from fastapi import APIRouter, Depends, HTTPException
-from httpx import AsyncClient
 from sqlalchemy import insert, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from .shemas import BalanceGet, BalanceCreate
 from ..auth.base import current_user
 from ..balance.models import Balance
 from ..transaction.shemas import TransactionCreate
@@ -16,6 +14,21 @@ router_balance = APIRouter(
     prefix="/balance",
     tags=["balances"]
 )
+
+@router_balance.post("/create", summary='Создание баланса пользователя')
+async def create_balance_user(user_id: int, session: AsyncSession = Depends(get_async_session)):
+    try:
+        balance = {"users_id": user_id, "total_balance": 0}
+        stmt = insert(Balance).values(**balance)
+        await session.execute(stmt)
+        await session.commit()
+
+    except Exception:
+        raise HTTPException(status_code=500, detail={
+            "status": "error",
+            "data": None,
+            "details": "Ошибка создание баланса"
+        })
 
 
 @router_balance.get("/", summary='Получение баланса')
