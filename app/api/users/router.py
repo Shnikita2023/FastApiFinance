@@ -1,11 +1,14 @@
-from typing import Any
+import math
+from typing import Any, Annotated
 
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends, Request, Query
 from starlette.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
 
-from app.api.auth.base import current_user
-from app.api.users import User
+from ..auth.base import current_user
+from ..transaction.services import TransactionService
+from ..users.models import User
+from ..depends.dependencies import transaction_service
 
 templates = Jinja2Templates(directory="app/api/templates")
 
@@ -35,7 +38,8 @@ async def get_template_authentic_user(request: Request, user: User = Depends(cur
     return templates.TemplateResponse("cabinet.html", {"request": request})
 
 
-@router_authentic.get("/cabinet/get_data_user", response_class=HTMLResponse, summary="Шаблон получение данных пользователя")
+@router_authentic.get("/cabinet/get_data_user", response_class=HTMLResponse,
+                      summary="Шаблон получение данных пользователя")
 async def get_data_user(request: Request, user: User = Depends(current_user)) -> Any:
     data_user = {
         "Почта": user.email,
@@ -48,16 +52,36 @@ async def get_data_user(request: Request, user: User = Depends(current_user)) ->
     return templates.TemplateResponse("get_data_user.html", {"request": request, "data_user": data_user})
 
 
-@router_authentic.get("/me", summary="Получение профиля user")  # Нужна удалить лишнее
-async def get_user_me(user: User = Depends(current_user)):
-    return user
-
-
-@router_authentic.get("/reset_password", summary="Форма сброса пароля")
+@router_authentic.get("/reset_password", summary="Форма сброса пароля", response_class=HTMLResponse)
 async def reset_pass(request: Request, token: str) -> Any:
     return templates.TemplateResponse("reset_password.html", {"request": request, 'token': token})
 
 
-@router_authentic.get("/send_email", summary="Отправка email")
+@router_authentic.get("/send_email", summary="Отправка email", response_class=HTMLResponse)
 async def send_email(request: Request) -> Any:
     return templates.TemplateResponse("email_recovery.html", {"request": request})
+
+
+@router_authentic.get("/cabinet/report", summary="Шаблон отчётов", response_class=HTMLResponse)
+async def send_report_transaction(request: Request,
+                                  transaction_service: Annotated[TransactionService, Depends(transaction_service)],
+                                  user: User = Depends(current_user),
+                                  page: int = Query(default=1, ge=1),
+                                  size: int = Query(default=10)
+                                  ) -> Any:
+    start = (page - 1) * size
+    end = start + size
+    list_transaction = await transaction_service.get_transaction_by_param_limit(value=user.id, page=start, size=size)
+    all_transactions = await transaction_service.get_transaction_by_param(value=user.id)
+    total_transaction = len(all_transactions)
+    total_pages = math.ceil(total_transaction / size)
+
+    return templates.TemplateResponse("reports.html",
+                                      {"request": request,
+                                       "data_transactions": list_transaction,
+                                       "start": start,
+                                       "end": end,
+                                       "page": page,
+                                       "total": total_transaction,
+                                       "total_pages": total_pages
+                                       })

@@ -1,17 +1,24 @@
+import uvicorn
+
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 
+# from fastapi_cache import FastAPICache
+# from fastapi_cache.backends.redis import RedisBackend
+#
+# from redis import asyncio as aioredis
 
 from starlette.responses import HTMLResponse
 from starlette.staticfiles import StaticFiles
 from starlette.templating import Jinja2Templates
 
-from .api.auth import auth_backend, fastapi_users
+from .api.auth.base import fastapi_users, auth_backend
 from .api.balance.router import router_balance
 from .api.category.router import router_categories
+from .api.tasks.router import router_tasks
 from .api.transaction.router import router_transaction
 from .api.users.router import router_register, router_authentic
-from .api.users.shemas import UserRead, UserCreate, UserUpdate
+from .api.users.shemas import UserRead, UserUpdate, UserCreate
 
 app = FastAPI()
 
@@ -21,13 +28,12 @@ app.mount("/static", StaticFiles(directory="app/api/static"), name="static")
 templates = Jinja2Templates(directory="app/api/templates")
 
 
-
 @app.get("/base", response_class=HTMLResponse)
 async def base_menu(request: Request):
     return templates.TemplateResponse("base.html", {"request": request})
 
-# Регистрация роутеров
 
+# Регистрация роутеров
 app.include_router(
     fastapi_users.get_auth_router(auth_backend),
     prefix="/auth/jwt",
@@ -61,9 +67,7 @@ app.include_router(router_register)
 app.include_router(router_authentic)
 app.include_router(router_balance)
 app.include_router(router_transaction)
-
-
-
+app.include_router(router_tasks)
 
 origins = [
     "http://127.0.0.1:8000/",
@@ -78,12 +82,13 @@ app.add_middleware(
                    "Authorization"],
 )
 
+
 # @app.on_event("startup")
 # async def startup() -> None:
 #     """Подключение редиса при старте"""
-#     redis = aioredis.from_url("redis://localhost", encoding="utf8", decode_responses=True)
+#     redis = aioredis.from_url("redis://localhost:6379", encoding="utf8", decode_responses=True)
 #     FastAPICache.init(RedisBackend(redis), prefix="fastapi-cache")
 
-if __name__ == '__main__':
-    import uvicorn
+
+if __name__ == "__main__":
     uvicorn.run(app)

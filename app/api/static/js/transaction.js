@@ -34,7 +34,7 @@ formFinance.addEventListener('submit', event => {
             "category": category
   }
 
-  fetch("http://127.0.0.1:8000/transaction/?category_name=" + category, {
+  fetch("http://127.0.0.1:8000/transaction/add?value=" + category, {
           method: "POST",
           headers: {
             "Content-Type": "application/json"
@@ -49,3 +49,4 @@ formFinance.addEventListener('submit', event => {
     .catch(error => console.log(`Ошибка: ${error}`));
 
 })
+

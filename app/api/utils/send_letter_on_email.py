@@ -15,7 +15,7 @@ async def connect_smtp(body: str, email: str, subject: str) -> None:
             message["From"] = SMTP_USER
             message["To"] = email
             message["Subject"] = subject
-            message.set_content(body)
+            message.add_alternative(body, subtype='html')
             await smtp.send_message(message=message)
 
     except Exception as exc:

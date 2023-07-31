@@ -1,19 +1,15 @@
-from datetime import datetime
-
+from typing import Annotated, Optional
 from fastapi import APIRouter, Depends, HTTPException
-from httpx import AsyncClient
-from sqlalchemy import insert, update, select
-from sqlalchemy.ext.asyncio import AsyncSession
+# from fastapi_cache.decorator import cache
 
-from .models import Transaction
-from .shemas import TransactionCreate
+from .shemas import TransactionCreate, TransactionGet
 from ..auth.base import current_user
-from ..balance.models import Balance
-from ..balance.router import get_data_balance, update_total_balance
 from ..category.models import Category
-from ..category.router import get_category
-from ..users import User
-from app.db.database import get_async_session
+from ..category.router import get_item_by_param
+from ..balance.services import BalanceService
+from ..transaction.services import TransactionService
+from ..users.models import User
+from ..depends.dependencies import transaction_service, balance_service
 
 router_transaction = APIRouter(
     prefix="/transaction",
@@ -22,38 +18,14 @@ router_transaction = APIRouter(
 
 
 @router_transaction.post("/add", summary='Добавление транзакции')
-async def add_transaction(new_transaction: TransactionCreate,
-                          session: AsyncSession = Depends(get_async_session)):
+async def create_transaction(transaction_service: Annotated[TransactionService, Depends(transaction_service)],
+                             balance_service: Annotated[BalanceService, Depends(balance_service)],
+                             data_form: dict,
+                             category: Category = Depends(get_item_by_param),
+                             user: User = Depends(current_user)) -> dict:
     try:
-        await update_total_balance(new_transaction, session)
-        await add_transaction(session, new_transaction)
-        return {
-            "status": "succeses",
-            "data": f"transaction added",
-            "details": None
-        }
-
-    except Exception:
-        raise HTTPException(status_code=500, detail={
-            "status": "error",
-            "data": None,
-            "details": None
-        })
-
-
-async def add_transaction(session: AsyncSession, new_transaction: TransactionCreate):
-    add_transaction = insert(Transaction).values(**new_transaction.dict())
-    await session.execute(add_transaction)
-    await session.commit()
-
-
-@router_transaction.post("/", summary='Формирование транзакции')
-async def formation_transaction(data_form: dict,
-                                user: User = Depends(current_user),
-                                category: Category = Depends(get_category),
-                                balance: Balance = Depends(get_data_balance)):
-    try:
-        transaction_data = TransactionCreate(
+        balance = await balance_service.get_balance_by_param(value=user.id)
+        new_transaction = TransactionCreate(
             comment=data_form["description"],
             amount=data_form["amount"],
             type_transaction=data_form["type"],
@@ -61,17 +33,33 @@ async def formation_transaction(data_form: dict,
             category_id=category.id,
             balance_id=balance.id
         )
+        transaction_id = await transaction_service.add_transaction(new_transaction, balance_service)
 
-        async with AsyncClient() as client:
-            URL = "http://localhost:8000/transaction/add"
-            response = await client.post(f"{URL}", json=transaction_data.dict())
+        return {
+            "status": "successes",
+            "data": transaction_id,
+            "details": f"transaction {transaction_id} added"
+        }
 
-        # Проверяем статус-код ответа
-        if response.status_code != 200:
-            raise HTTPException(status_code=response.status_code, detail=response.text)
+    except Exception:
+        raise HTTPException(status_code=500, detail={
+            "status": "error",
+            "data": None,
+            "details": "Ошибка добавление транзакции"
+        })
 
-        return response.json()
 
+@router_transaction.get("/", summary='Получение всех транзакций пользователя', response_model=list[TransactionGet])
+# @cache(expire=600)
+async def get_transactions(transaction_service: Annotated[TransactionService, Depends(transaction_service)],
+                           user: User = Depends(current_user),
+                           value: Optional[int] = None,
+                           param_column: str = "user_id"):
+    try:
+        if value is None:
+            value = user.id
+        all_transactions = await transaction_service.get_transaction_by_param(value, param_column)
+        return all_transactions
 
     except Exception:
         raise HTTPException(status_code=500, detail={
@@ -81,3 +69,21 @@ async def formation_transaction(data_form: dict,
         })
 
 
+@router_transaction.delete("/", summary='Удаление транзакций пользователя')
+async def delete_transaction(transaction_service: Annotated[TransactionService, Depends(transaction_service)],
+                             transaction_id: int,
+                             user: User = Depends(current_user)) -> dict:
+    try:
+        one_transaction = await transaction_service.delete_transaction(transaction_id)
+        return {
+            "status": "successes",
+            "data": one_transaction,
+            "details": f"transaction c id {one_transaction} delete"
+        }
+
+    except Exception:
+        raise HTTPException(status_code=500, detail={
+            "status": "error",
+            "data": None,
+            "details": "Ошибка удаление транзакций"
+        })

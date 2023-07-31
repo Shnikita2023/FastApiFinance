@@ -20,6 +20,12 @@ form.addEventListener('submit', event => {
                 return window.location.href = '/authentic/cabinet';
            }
        })
-       .catch((error) => console.log(`Ошибка запроса: ${error}`));
+       .catch((error) => {
+            const detail = error.response.data.detail
+            if (detail == "LOGIN_BAD_CREDENTIALS") {
+                alert("Проверьте правильность ввода email и password")
+            }
+            console.log(`Ошибка запроса!!: ${error}`);
+       })
 
 });

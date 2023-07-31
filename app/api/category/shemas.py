@@ -1,8 +1,4 @@
-from datetime import datetime
-
 from pydantic import BaseModel
-
-
 
 
 class CategoryCreate(BaseModel):
@@ -12,7 +8,6 @@ class CategoryCreate(BaseModel):
     class Config:
         orm_mode = True
 
+
 class CategoryGet(CategoryCreate):
     id: int
-
-

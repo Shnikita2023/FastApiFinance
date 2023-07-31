@@ -28,6 +28,9 @@ FormCategory.addEventListener('submit', event => {
                   alert("Категория добавлена");
              }
          })
-         .catch((error) => console.log(`Ошибка запроса: ${error}`));
+         .catch((error) => {
+             alert("Такие данные уже существуют")
+             console.log(`Ошибка запроса: ${error}`)
+         });
 
 })

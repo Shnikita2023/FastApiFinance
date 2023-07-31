@@ -1,9 +1,7 @@
+from datetime import datetime
 from typing import Literal
 
 from pydantic import BaseModel
-from enum import Enum
-
-
 
 
 class TransactionCreate(BaseModel):
@@ -14,9 +12,10 @@ class TransactionCreate(BaseModel):
     category_id: int
     balance_id: int
 
-
     class Config:
         orm_mode = True
 
+
 class TransactionGet(TransactionCreate):
-    pass
+    id: int
+    date: datetime

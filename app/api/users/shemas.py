@@ -4,7 +4,7 @@ from typing import Optional
 
 from fastapi import HTTPException
 from fastapi_users import schemas
-from pydantic import BaseSettings, validator, Field, EmailStr
+from pydantic import validator, Field, EmailStr
 
 PATTERN = r"^[А-ЯЁ][а-яё]+$|^[A-Z][a-z]+$"
 
@@ -60,11 +60,24 @@ class UserCreate(schemas.BaseUserCreate):
         return password
 
     @validator("first_name")
-    def check_last_name(cls, first_name):
+    def check_first_name(cls, first_name):
         if not re.match(PATTERN, first_name):
             raise HTTPException(status_code=400,
-                                detail="Поля с именем должно быть ru/en и начинаться с большой буквы, затем строчные")
+                                detail="Поля 'Имя' должно начинаться с большой буквы, затем строчные")
         return first_name
+
+    @validator("last_name")
+    def check_last_name(cls, last_name):
+        if not re.match(PATTERN, last_name):
+            raise HTTPException(status_code=400,
+                                detail="Поля 'Фамилия' должно начинаться с большой буквы, затем строчные")
+        return last_name
+
+    @validator("username")
+    def check_username(cls, username):
+        if not username.isalpha():
+            raise HTTPException(status_code=400, detail="Поля 'Никнейм' должен содержать только буквы")
+        return username
 
 
 class UserUpdate(UserCreate):

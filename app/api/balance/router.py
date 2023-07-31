@@ -1,27 +1,29 @@
-from datetime import datetime
+from typing import Annotated, Optional
 
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy import insert, select, update
-from sqlalchemy.ext.asyncio import AsyncSession
 
+from .shemas import BalanceGet, BalanceUpdate
 from ..auth.base import current_user
-from ..balance.models import Balance
-from ..transaction.shemas import TransactionCreate
-from ..users import User
-from app.db.database import get_async_session
+from ..balance.services import BalanceService
+from ..users.models import User
+from ..depends.dependencies import balance_service
 
 router_balance = APIRouter(
     prefix="/balance",
     tags=["balances"]
 )
 
-@router_balance.post("/create", summary='Создание баланса пользователя')
-async def create_balance_user(user_id: int, session: AsyncSession = Depends(get_async_session)):
+
+@router_balance.post("/", summary='Создание баланса пользователя')
+async def create_balance_user(balance_service: Annotated[BalanceService, Depends(balance_service)],
+                              user: User = Depends(current_user)) -> dict:
     try:
-        balance = {"users_id": user_id, "total_balance": 0}
-        stmt = insert(Balance).values(**balance)
-        await session.execute(stmt)
-        await session.commit()
+        balance_id = await balance_service.add_balance(user.id)
+        return {
+            "status": "successes",
+            "data": f"Баланс с id {balance_id} added",
+            "details": None
+        }
 
     except Exception:
         raise HTTPException(status_code=500, detail={
@@ -31,37 +33,54 @@ async def create_balance_user(user_id: int, session: AsyncSession = Depends(get_
         })
 
 
-@router_balance.get("/", summary='Получение баланса')
-async def get_data_balance(session: AsyncSession = Depends(get_async_session),
-                           user: User = Depends(current_user)):
+@router_balance.get("/get/{balance_id}", summary='Получение баланса пользователя', response_model=BalanceGet)
+async def get_data_balance(balance_service: Annotated[BalanceService, Depends(balance_service)],
+                           balance_id: int,
+                           user: User = Depends(current_user)) -> BalanceGet:
     try:
-        query = select(Balance).where(Balance.users_id == user.id)
-        result = await session.execute(query)
-        return result.scalar_one()
+        one_balance = await balance_service.get_balance(balance_id)
+        return one_balance
 
     except Exception:
         raise HTTPException(status_code=500, detail={
             "status": "error",
             "data": None,
-            "details": None
+            "details": "Ошибка получение баланса"
         })
 
 
-async def update_total_balance(new_transaction: TransactionCreate,
-                               session: AsyncSession) -> None:
-    """Обновление баланса"""
+@router_balance.get("/", summary='Получение баланса пользователя по любым параметрам',
+                    response_model=BalanceGet)
+async def get_balance_by_param(balance_service: Annotated[BalanceService, Depends(balance_service)],
+                               value: Optional[int] = None,
+                               param_column: str = "users_id",
+                               user: User = Depends(current_user)):
     try:
-        total_balance = select(Balance.total_balance).where(Balance.users_id == new_transaction.user_id)
-        result = await session.execute(total_balance)
-        if new_transaction.type_transaction == 'Доход':
-            new_balance = result.scalar_one() + new_transaction.amount
-        else:
-            new_balance = result.scalar_one() - new_transaction.amount
-
-        update_balance = (update(Balance).where(Balance.id == new_transaction.balance_id).values
-                          (total_balance=new_balance, date=datetime.now()))
-        await session.execute(update_balance)
-        await session.commit()
+        if value is None:
+            value = user.id
+        one_balance = await balance_service.get_balance_by_param(value, param_column)
+        return one_balance
 
     except Exception:
-        pass
+        raise HTTPException(status_code=500, detail={
+            "status": "error",
+            "data": None,
+            "details": "Ошибка получение баланса"
+        })
+
+
+@router_balance.patch("/{balance_id}", summary='Обновление баланса пользователя')
+async def update_total_balance(balance_id: int,
+                               new_data: BalanceUpdate,
+                               balance_service: Annotated[BalanceService, Depends(balance_service)],
+                               user: User = Depends(current_user)) -> dict:
+    try:
+        new_balance = await balance_service.update_balance(balance_id, new_data.total_balance)
+        return new_balance
+
+    except Exception:
+        raise HTTPException(status_code=500, detail={
+            "status": "error",
+            "data": None,
+            "details": "Ошибка обновление баланса"
+        })

@@ -49,7 +49,7 @@ const myBalance = () => {
             }
           })
           .catch(error => {
-            console.log("Ошибка");
+            console.log("Ошибка получение баланса");
           });
 
   } else {
