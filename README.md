@@ -50,7 +50,7 @@
 
 ##### 10) Запустить сервер
 
-    uvicorn main:app --reload
+    uvicorn app.main:app --reload
 
 ##### 10) Перейти по адресу
 
