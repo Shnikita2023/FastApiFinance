@@ -4,8 +4,6 @@ from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 
 from alembic import context
-import os
-import sys
 
 from app.config import DB_USER, DB_PASS, DB_HOST, DB_PORT, DB_NAME
 from app.db.database import Base
@@ -14,7 +12,7 @@ from app.api.balance.models import *
 from app.api.transaction.models import *
 from app.api.users.models import *
 
-sys.path.append(os.path.join(sys.path[0], 'src'))
+# sys.path.append(os.path.join(sys.path[0], 'src'))
 
 config = context.config
 section = config.config_ini_section

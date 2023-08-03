@@ -1,7 +1,7 @@
 from typing import Annotated, Any
 
 from fastapi import APIRouter, Depends, HTTPException, Request
-# from fastapi_cache.decorator import cache
+from fastapi_cache.decorator import cache
 from starlette.responses import HTMLResponse
 from starlette.templating import Jinja2Templates
 
@@ -20,7 +20,7 @@ router_categories = APIRouter(
 
 
 @router_categories.get("/get/{id_category}", summary='Получение категории по id', response_model=CategoryGet)
-# @cache(expire=60)
+@cache(expire=60)
 async def get_category(id_category: int,
                        category_service: Annotated[CategoryService, Depends(category_service)],
                        user: User = Depends(current_user)):

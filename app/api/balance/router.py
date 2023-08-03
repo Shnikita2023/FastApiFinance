@@ -18,6 +18,13 @@ router_balance = APIRouter(
 async def create_balance_user(balance_service: Annotated[BalanceService, Depends(balance_service)],
                               user: User = Depends(current_user)) -> dict:
     try:
+        balance_user = balance_service.get_balance_by_param(value=user.id)
+        if balance_user:
+            return {
+                "status": "error",
+                "data": "У данного пользователя уже есть баланс",
+                "details": None
+            }
         balance_id = await balance_service.add_balance(user.id)
         return {
             "status": "successes",

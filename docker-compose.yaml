@@ -6,14 +6,10 @@ services:
     image: postgres
     restart: always
     container_name: database
-    environment:
-      POSTGRES_DB: "finance"
-      POSTGRES_USER: "admin"
-      POSTGRES_PASSWORD: "admin"
+    env_file:
+      - .env-non-dev
     ports:
-      - "5438:5432"
-    networks:
-      - custom
+      - "5435:5432"
 
   database_test:
     image: postgres
@@ -24,40 +20,29 @@ services:
       POSTGRES_USER: "admin"
       POSTGRES_PASSWORD: "admin"
     ports:
-      - "5440:5432"
-    networks:
-      - custom
+      - "5436:5432"
 
-networks:
-  custom:
-    driver: bridge
+  redis:
+    image: redis
+    restart: always
+    env_file:
+      - .env-non-dev
+    container_name: redis_app
+    ports:
+      - "5378:6379"
 
-
-
-       #  redis:
-#    image: redis
-#    restart: always
-#    container_name: redis_app
-#    command: -p 5436
-#    expose:
-#      - 5436
-#
-#
-#  api:
-#    restart: always
+#  app:
 #    build:
 #      context: .
 #    env_file:
 #      - .env-non-dev
 #    container_name: fastapi_app
-#
-#    command:
-#      - bash -c " uvicorn src.app:app --reload
+#    command: ["/fastapi_app/docker/app.sh"]
 #    ports:
-#      - 8001:8000
+#      - "8000:8000"
 #    depends_on:
-#      - db_app
-#      - redis_app
+#      - database
+#      - database_test
+#      - redis
 #
-
 

@@ -1,4 +1,3 @@
-from celery import Celery
 from fastapi import Request
 
 from starlette.templating import Jinja2Templates
@@ -6,7 +5,7 @@ from starlette.templating import Jinja2Templates
 from ..transaction.shemas import TransactionGet
 from ..utils.send_letter_on_email import connect_smtp
 
-celery = Celery('tasks', broker='redis://localhost:6379')
+# celery = Celery('tasks', broker='redis://localhost:6379')
 
 templates = Jinja2Templates(directory="app/api/templates")
 

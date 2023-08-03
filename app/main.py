@@ -3,15 +3,16 @@ import uvicorn
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 
-# from fastapi_cache import FastAPICache
-# from fastapi_cache.backends.redis import RedisBackend
-#
-# from redis import asyncio as aioredis
+from fastapi_cache import FastAPICache
+from fastapi_cache.backends.redis import RedisBackend
+
+from redis import asyncio as aioredis
 
 from starlette.responses import HTMLResponse
 from starlette.staticfiles import StaticFiles
 from starlette.templating import Jinja2Templates
 
+from app.config import REDIS_HOST, REDIS_PORT
 from .api.auth.base import fastapi_users, auth_backend
 from .api.balance.router import router_balance
 from .api.category.router import router_categories
@@ -28,7 +29,7 @@ app.mount("/static", StaticFiles(directory="app/api/static"), name="static")
 templates = Jinja2Templates(directory="app/api/templates")
 
 
-@app.get("/base", response_class=HTMLResponse)
+@app.get("/base", response_class=HTMLResponse, summary="Начальная страница")
 async def base_menu(request: Request):
     return templates.TemplateResponse("base.html", {"request": request})
 
@@ -83,11 +84,11 @@ app.add_middleware(
 )
 
 
-# @app.on_event("startup")
-# async def startup() -> None:
-#     """Подключение редиса при старте"""
-#     redis = aioredis.from_url("redis://localhost:6379", encoding="utf8", decode_responses=True)
-#     FastAPICache.init(RedisBackend(redis), prefix="fastapi-cache")
+@app.on_event("startup")
+async def startup() -> None:
+    """Подключение редиса при старте"""
+    redis = aioredis.from_url(f"redis://{REDIS_HOST}:{REDIS_PORT}", encoding="utf8", decode_responses=True)
+    FastAPICache.init(RedisBackend(redis), prefix="fastapi-cache")
 
 
 if __name__ == "__main__":

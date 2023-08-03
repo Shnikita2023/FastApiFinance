@@ -1,6 +1,6 @@
 from typing import Annotated, Optional
 from fastapi import APIRouter, Depends, HTTPException
-# from fastapi_cache.decorator import cache
+from fastapi_cache.decorator import cache
 
 from .shemas import TransactionCreate, TransactionGet
 from ..auth.base import current_user
@@ -50,7 +50,7 @@ async def create_transaction(transaction_service: Annotated[TransactionService, 
 
 
 @router_transaction.get("/", summary='Получение всех транзакций пользователя', response_model=list[TransactionGet])
-# @cache(expire=600)
+@cache(expire=600)
 async def get_transactions(transaction_service: Annotated[TransactionService, Depends(transaction_service)],
                            user: User = Depends(current_user),
                            value: Optional[int] = None,

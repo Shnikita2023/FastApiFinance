@@ -53,7 +53,7 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
         user = await self.user_db.get_by_email(user_email)
 
         if user is None:
-            raise HTTPException(status_code=400, detail='Невалидный email')
+            raise HTTPException(status_code=400, detail='Невалидные данные, проверьте корректность ввода')
         return user
 
     async def on_after_forgot_password(self, user: User, token: str, request: Optional[Request] = None) -> None:
