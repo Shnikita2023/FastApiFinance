@@ -7,42 +7,26 @@ services:
     restart: always
     container_name: database
     env_file:
-      - .env-non-dev
+      - .env
     ports:
-      - "5435:5432"
+      - "5430:5432"
 
   database_test:
     image: postgres
     restart: always
     container_name: database_test
     environment:
-      POSTGRES_DB: "finance_test"
-      POSTGRES_USER: "admin"
-      POSTGRES_PASSWORD: "admin"
+      POSTGRES_DB: "postgres"
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "postgres"
     ports:
-      - "5436:5432"
+      - "5444:5432"
 
   redis:
     image: redis
     restart: always
     env_file:
-      - .env-non-dev
+      - .env
     container_name: redis_app
     ports:
-      - "5378:6379"
-
-#  app:
-#    build:
-#      context: .
-#    env_file:
-#      - .env-non-dev
-#    container_name: fastapi_app
-#    command: ["/fastapi_app/docker/app.sh"]
-#    ports:
-#      - "8000:8000"
-#    depends_on:
-#      - database
-#      - database_test
-#      - redis
-#
-
+      - "5370:6379"
