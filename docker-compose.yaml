@@ -29,10 +29,6 @@ services:
       - .env
     container_name: redis_app
     ports:
-<<<<<<< HEAD
       - "5378:6379"
-
-
-=======
       - "5370:6379"
->>>>>>> e7d9582bc03b4c2144f2e4747a683e07b8204936
+
