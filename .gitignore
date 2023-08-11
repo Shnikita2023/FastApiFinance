@@ -2,5 +2,10 @@
 /venv/
 /.env-non-dev
 .pytest_cache
+<<<<<<< HEAD
 /.idea
 /__pycache__
+=======
+.idea
+__pycache__/
+>>>>>>> e7d9582bc03b4c2144f2e4747a683e07b8204936
