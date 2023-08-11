@@ -4,7 +4,7 @@
 .pytest_cache
 <<<<<<< HEAD
 /.idea
-/__pycache__
+__pycache__
 =======
 .idea
 __pycache__/
