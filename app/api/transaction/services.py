@@ -1,56 +1,55 @@
 from typing import Any
 
-from ..balance.services import BalanceService
-from ..repositories.base_repository import AbstractRepository
-from ..services.base_service import BaseService
 from ..transaction.shemas import TransactionCreate, TransactionGet
+from ..utils.unitofwork import IUnitOfWork
 
 
-
-class TransactionService(BaseService):
-    def __init__(self, transaction_repo: AbstractRepository):
-        self.transaction_repo: AbstractRepository
-        super().__init__(transaction_repo)
-
-    async def add_transaction(self, new_transaction: TransactionCreate, balance_service: BalanceService) -> int:
+class TransactionService:
+    async def add_transaction(self, new_transaction: TransactionCreate, uow: IUnitOfWork) -> int:
         balance_id = new_transaction.balance_id
         category_amount = new_transaction.amount
-        now_balance = await balance_service.get_balance(balance_id)
-        if new_transaction.type_transaction == "Доход":
-            new_balance = now_balance.total_balance + category_amount
-        else:
-            new_balance = now_balance.total_balance - category_amount
-        transaction_id = await self.add_one(new_transaction.dict())
-        try:
-            await balance_service.update_balance(balance_id, new_balance)
+        async with uow:
+            now_balance = await uow.balance.find_one(balance_id)
+            if new_transaction.type_transaction == "Доход":
+                new_balance = now_balance.total_balance + category_amount
+            else:
+                new_balance = now_balance.total_balance - category_amount
+            transaction_id = await uow.transaction.add_one(new_transaction.dict())
+            new_balance = {"total_balance": new_balance}
+            await uow.balance.update_one(balance_id, new_balance)
+            await uow.commit()
+            return transaction_id
 
-        except Exception as ex:
-            await self.delete_one(transaction_id)  # Откатываем транзакцию, удаление объекта
-            raise ex
+    async def get_transactions(self, uow: IUnitOfWork) -> list[TransactionGet]:
+        async with uow:
+            all_transaction = await uow.transaction.find_all()
+            return all_transaction
 
-        return transaction_id
+    async def get_transaction(self, id_category: int, uow: IUnitOfWork) -> TransactionGet:
+        async with uow:
+            one_transaction = await uow.transaction.find_one(id_category)
+            return one_transaction
 
-    async def get_transactions(self) -> list[TransactionGet]:
-        all_transaction = await self.find_all()
-        return all_transaction
-
-    async def get_transaction(self, id_category: int) -> TransactionGet:
-        one_transaction = await self.find_one(id_category)
-        return one_transaction
-
-    async def get_transaction_by_param(self, value: Any, param_column: str = "user_id") -> list[TransactionGet]:
-        all_transaction = await self.find_by_param(param_column, value)
-        return all_transaction
+    async def get_transaction_by_param(self,
+                                       value: Any,
+                                       uow: IUnitOfWork,
+                                       param_column: str = "user_id") -> list[TransactionGet]:
+        async with uow:
+            all_transaction = await uow.transaction.find_by_param(param_column, value)
+            return all_transaction
 
     async def get_transaction_by_param_limit(self,
                                              value: Any,
                                              page: int,
                                              size: int,
+                                             uow: IUnitOfWork,
                                              param_column: str = "user_id") -> list[TransactionGet]:
+        async with uow:
+            limit_transaction = await uow.transaction.find_by_param_limit(param_column, value, page, size)
+            return limit_transaction
 
-        limit_transaction = await self.find_by_param_limit(param_column, value, page, size)
-        return limit_transaction
-
-    async def delete_transaction(self, transaction_id: int) -> int:
-        one_transaction = await self.delete_one(transaction_id)
-        return one_transaction
+    async def delete_transaction(self, transaction_id: int, uow: IUnitOfWork) -> int:
+        async with uow:
+            one_transaction = await uow.transaction.delete_one(transaction_id)
+            await uow.commit()
+            return one_transaction

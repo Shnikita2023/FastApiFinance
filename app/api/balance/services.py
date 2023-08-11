@@ -1,30 +1,36 @@
 from typing import Any
 
 from ..balance.shemas import BalanceGet
-from ..repositories.base_repository import AbstractRepository
-
-from ..services.base_service import BaseService
+from ..utils.unitofwork import IUnitOfWork
 
 
-class BalanceService(BaseService):
-    def __init__(self, balance_repo: AbstractRepository):
-        self.balance_repo: AbstractRepository
-        super().__init__(balance_repo)
-
-    async def add_balance(self, user_id: int) -> int:
+class BalanceService:
+    async def add_balance(self, user_id: int, uow: IUnitOfWork) -> int:
         balance_dict = {"users_id": user_id}
-        balance_id = await self.add_one(balance_dict)
-        return balance_id
+        async with uow:
+            balance_id = await uow.balance.add_one(data=balance_dict)
+            await uow.commit()
+            return balance_id
 
-    async def get_balance(self, balance_id: int) -> BalanceGet:
-        one_balance = await self.find_one(balance_id)
-        return one_balance
+    async def get_balance(self, balance_id: int, uow) -> BalanceGet:
+        async with uow:
+            one_balance = await uow.balance.find_one(balance_id)
+            return one_balance
 
-    async def get_balance_by_param(self, value: Any, param_column: str = "users_id") -> BalanceGet:
-        one_balance = await self.find_by_param(param_column, value)
-        return one_balance[0]
+    async def get_balance_by_param(self,
+                                   value: Any,
+                                   uow: IUnitOfWork,
+                                   param_column: str = "users_id") -> BalanceGet:
+        async with uow:
+            one_balance = await uow.balance.find_by_param(param_column, value)
+            return one_balance[0] if len(one_balance) > 0 else one_balance
 
-    async def update_balance(self, balance_id: int, new_data: float) -> dict:
+    async def update_balance(self,
+                             balance_id: int,
+                             new_data: float,
+                             uow: IUnitOfWork) -> dict:
         new_data = {"total_balance": new_data}
-        new_balance = await self.update_one(balance_id, new_data)
-        return new_balance
+        async with uow:
+            new_balance = await uow.balance.update_one(balance_id, new_data)
+            await uow.commit()
+            return new_balance

@@ -10,7 +10,9 @@ from ..utils.send_letter_on_email import connect_smtp
 templates = Jinja2Templates(directory="app/api/templates")
 
 
-async def send_email_report_transaction(request: Request, data_transaction: list[TransactionGet], email_user: str):
+async def send_email_report_transaction(request: Request,
+                                        data_transaction: list[TransactionGet],
+                                        email_user: str):
     # Загрузить HTML шаблон
     template = templates.get_template("report_transactions.html")
     report_html = template.render(request=request, data_transaction=data_transaction)

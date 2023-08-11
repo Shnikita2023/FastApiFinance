@@ -23,14 +23,14 @@ formFinance.addEventListener('submit', event => {
   const formData = new FormData(event.target) // Создаём новую форму с помощью метода event
   const amount = formData.get('amount')
   const category = formData.get('category')
-  const description = formData.get('description')
-  const type = formData.get('type')
+  const description = formData.get('comment')
+  const type = formData.get('type_transaction')
 
 
   data_expense = {
             "amount": amount,
-            "description": description,
-            "type": type,
+            "comment": comment,
+            "type_transaction": type_transaction,
             "category": category
   }
 

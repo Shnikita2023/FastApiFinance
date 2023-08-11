@@ -12,7 +12,7 @@ from starlette.responses import HTMLResponse
 from starlette.staticfiles import StaticFiles
 from starlette.templating import Jinja2Templates
 
-from app.config import REDIS_HOST, REDIS_PORT
+from .config import REDIS_HOST, REDIS_PORT
 from .api.auth.base import fastapi_users, auth_backend
 from .api.balance.router import router_balance
 from .api.category.router import router_categories

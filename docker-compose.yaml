@@ -16,9 +16,9 @@ services:
     restart: always
     container_name: database_test
     environment:
-      POSTGRES_DB: "postgres"
-      POSTGRES_USER: "postgres"
-      POSTGRES_PASSWORD: "postgres"
+      POSTGRES_DB: "finance_test"
+      POSTGRES_USER: "admin"
+      POSTGRES_PASSWORD: "admin"
     ports:
       - "5436:5432"
 

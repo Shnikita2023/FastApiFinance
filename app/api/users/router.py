@@ -1,14 +1,14 @@
 import math
-from typing import Any, Annotated
+from typing import Any
 
 from fastapi import APIRouter, Depends, Request, Query
 from starlette.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
 
 from ..auth.base import current_user
+from ..depends.dependencies import UOWDep
 from ..transaction.services import TransactionService
 from ..users.models import User
-from ..depends.dependencies import transaction_service
 
 templates = Jinja2Templates(directory="app/api/templates")
 
@@ -64,15 +64,16 @@ async def send_email(request: Request) -> Any:
 
 @router_authentic.get("/cabinet/report", summary="Шаблон отчётов", response_class=HTMLResponse)
 async def send_report_transaction(request: Request,
-                                  transaction_service: Annotated[TransactionService, Depends(transaction_service)],
+                                  uow: UOWDep,
                                   user: User = Depends(current_user),
                                   page: int = Query(default=1, ge=1),
                                   size: int = Query(default=10)
                                   ) -> Any:
     start = (page - 1) * size
     end = start + size
-    list_transaction = await transaction_service.get_transaction_by_param_limit(value=user.id, page=start, size=size)
-    all_transactions = await transaction_service.get_transaction_by_param(value=user.id)
+    list_transaction = await TransactionService().get_transaction_by_param_limit(value=user.id, page=start, size=size,
+                                                                                 uow=uow)
+    all_transactions = await TransactionService().get_transaction_by_param(value=user.id, uow=uow)
     total_transaction = len(all_transactions)
     total_pages = math.ceil(total_transaction / size)
 

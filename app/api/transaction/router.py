@@ -1,15 +1,18 @@
-from typing import Annotated, Optional
+from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi_cache.decorator import cache
 
 from .shemas import TransactionCreate, TransactionGet
 from ..auth.base import current_user
+from ..balance.models import Balance
+from ..balance.router import get_balance_by_param
 from ..category.models import Category
 from ..category.router import get_item_by_param
 from ..balance.services import BalanceService
+from ..depends.dependencies import UOWDep
 from ..transaction.services import TransactionService
 from ..users.models import User
-from ..depends.dependencies import transaction_service, balance_service
+
 
 router_transaction = APIRouter(
     prefix="/transaction",
@@ -18,22 +21,21 @@ router_transaction = APIRouter(
 
 
 @router_transaction.post("/add", summary='Добавление транзакции')
-async def create_transaction(transaction_service: Annotated[TransactionService, Depends(transaction_service)],
-                             balance_service: Annotated[BalanceService, Depends(balance_service)],
+async def create_transaction(uow: UOWDep,
                              data_form: dict,
                              category: Category = Depends(get_item_by_param),
                              user: User = Depends(current_user)) -> dict:
     try:
-        balance = await balance_service.get_balance_by_param(value=user.id)
+        balance = await BalanceService().get_balance_by_param(value=user.id, uow=uow)
         new_transaction = TransactionCreate(
-            comment=data_form["description"],
+            comment=data_form["comment"],
             amount=data_form["amount"],
-            type_transaction=data_form["type"],
+            type_transaction=data_form["type_transaction"],
             user_id=user.id,
             category_id=category.id,
             balance_id=balance.id
         )
-        transaction_id = await transaction_service.add_transaction(new_transaction, balance_service)
+        transaction_id = await TransactionService().add_transaction(new_transaction, uow)
 
         return {
             "status": "successes",
@@ -51,14 +53,14 @@ async def create_transaction(transaction_service: Annotated[TransactionService, 
 
 @router_transaction.get("/", summary='Получение всех транзакций пользователя', response_model=list[TransactionGet])
 @cache(expire=600)
-async def get_transactions(transaction_service: Annotated[TransactionService, Depends(transaction_service)],
+async def get_transactions(uow: UOWDep,
                            user: User = Depends(current_user),
                            value: Optional[int] = None,
                            param_column: str = "user_id"):
     try:
         if value is None:
             value = user.id
-        all_transactions = await transaction_service.get_transaction_by_param(value, param_column)
+        all_transactions = await TransactionService().get_transaction_by_param(value, uow, param_column)
         return all_transactions
 
     except Exception:
@@ -70,11 +72,11 @@ async def get_transactions(transaction_service: Annotated[TransactionService, De
 
 
 @router_transaction.delete("/", summary='Удаление транзакций пользователя')
-async def delete_transaction(transaction_service: Annotated[TransactionService, Depends(transaction_service)],
+async def delete_transaction(uow: UOWDep,
                              transaction_id: int,
                              user: User = Depends(current_user)) -> dict:
     try:
-        one_transaction = await transaction_service.delete_transaction(transaction_id)
+        one_transaction = await TransactionService().delete_transaction(transaction_id, uow)
         return {
             "status": "successes",
             "data": one_transaction,

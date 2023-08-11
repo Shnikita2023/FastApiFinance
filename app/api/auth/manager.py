@@ -5,12 +5,12 @@ from fastapi_users import BaseUserManager, IntegerIDMixin, models, schemas
 
 from .utils import get_user_db
 from ..balance.services import BalanceService
+from ..depends.dependencies import UOWDep
 from ..users.shemas import UserCreate
 from ..users.models import User
 from ..utils.send_letter_on_email import send_password_reset_email, send_letter_on_after_register
-from ..depends.dependencies import balance_service
-
 from app.config import SECRET_AUTH_RESET, SECRET_AUTH_VERIF_TOKEN
+
 
 
 class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
@@ -38,10 +38,10 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
         )
         password = user_dict.pop("password")
         user_dict["hashed_password"] = self.password_helper.hash(password)
-        created_user = await self.user_db.create(user_dict)  # Создание пользователя
-
-        create_balance_user: BalanceService = balance_service()
-        await create_balance_user.add_balance(user_id=created_user.id)  # Добавление баланса пользователя
+        # Создание пользователя
+        created_user = await self.user_db.create(user_dict)
+        # Создание баланса
+        await BalanceService().add_balance(created_user.id, UOWDep())
 
         await self.on_after_register(created_user, request)
         return created_user

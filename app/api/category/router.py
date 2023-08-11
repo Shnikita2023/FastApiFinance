@@ -1,4 +1,4 @@
-from typing import Annotated, Any
+from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi_cache.decorator import cache
@@ -8,8 +8,9 @@ from starlette.templating import Jinja2Templates
 from .shemas import CategoryGet, CategoryCreate
 from ..auth.base import current_user
 from app.api.category.services import CategoryService
+from ..depends.dependencies import UOWDep
 from ..users.models import User
-from ..depends.dependencies import category_service
+
 
 templates = Jinja2Templates(directory="app/api/templates")
 
@@ -22,10 +23,10 @@ router_categories = APIRouter(
 @router_categories.get("/get/{id_category}", summary='Получение категории по id', response_model=CategoryGet)
 @cache(expire=60)
 async def get_category(id_category: int,
-                       category_service: Annotated[CategoryService, Depends(category_service)],
+                       uow: UOWDep,
                        user: User = Depends(current_user)):
     try:
-        one_category = await category_service.get_category(id_category)
+        one_category = await CategoryService().get_category(id_category, uow)
         return one_category
 
     except Exception:
@@ -38,11 +39,11 @@ async def get_category(id_category: int,
 
 @router_categories.get("/", summary='Получение категории по любым параметрам', response_model=CategoryGet)
 async def get_item_by_param(value: Any,
-                            category_service: Annotated[CategoryService, Depends(category_service)],
+                            uow: UOWDep,
                             param_column: str = "name",
                             user: User = Depends(current_user)):
     try:
-        one_category = await category_service.get_category_by_param(param_column, value)
+        one_category = await CategoryService().get_category_by_param(param_column, value, uow)
         return one_category
 
     except Exception:
@@ -54,10 +55,10 @@ async def get_item_by_param(value: Any,
 
 
 @router_categories.get("/all", summary='Получение списка всех категорий', response_model=list[CategoryGet])
-async def get_all_categories(category_service: Annotated[CategoryService, Depends(category_service)],
+async def get_all_categories(uow: UOWDep,
                              user: User = Depends(current_user)):
     try:
-        all_category = await category_service.get_categories()
+        all_category = await CategoryService().get_categories(uow)
         return all_category
 
     except Exception:
@@ -70,10 +71,10 @@ async def get_all_categories(category_service: Annotated[CategoryService, Depend
 
 @router_categories.post("/add", summary='Добавление категории')
 async def create_category(new_categorie: CategoryCreate,
-                          category_service: Annotated[CategoryService, Depends(category_service)],
+                          uow: UOWDep,
                           user: User = Depends(current_user)):
     try:
-        category_id = await category_service.add_category(new_categorie)
+        category_id = await CategoryService().add_category(new_categorie, uow)
         return {
             "status": "successes",
             "data": f"product с номером {category_id} added",
@@ -90,9 +91,9 @@ async def create_category(new_categorie: CategoryCreate,
 
 @router_categories.delete("/", summary='Удаление категории')
 async def delete_category(category_id: int,
-                          category_service: Annotated[CategoryService, Depends(category_service)]) -> dict:
+                          uow: UOWDep) -> dict:
     try:
-        await category_service.delete_category(category_id)
+        await CategoryService().delete_category(category_id, uow)
         return {
             "status": "successes",
             "data": f"product c id {category_id} removed",

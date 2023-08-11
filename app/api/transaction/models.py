@@ -12,15 +12,15 @@ from app.db.database import Base
 class Transaction(Base):
     __tablename__ = "transactions"
 
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    id: Mapped[int] = mapped_column(primary_key=True, index=True)
     date: Mapped[datetime] = mapped_column(TIMESTAMP, server_default=text('CURRENT_TIMESTAMP'))
-    comment: Mapped[str] = mapped_column(String)
-    amount: Mapped[float] = mapped_column(Float, nullable=False)
+    comment: Mapped[str] = mapped_column()
+    amount: Mapped[float] = mapped_column(nullable=False)
     type_transaction: Mapped[str] = mapped_column(String(10), nullable=False)
 
-    user_id: Mapped[int] = mapped_column(Integer, ForeignKey("users.id"), index=True)
-    category_id: Mapped[int] = mapped_column(Integer, ForeignKey("categories.id"))
-    balance_id: Mapped[int] = mapped_column(Integer, ForeignKey('balance.id'))
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), index=True)
+    category_id: Mapped[int] = mapped_column(ForeignKey("categories.id"))
+    balance_id: Mapped[int] = mapped_column(ForeignKey('balance.id'))
 
     user = relationship("User", back_populates="transaction")
     category = relationship("Category", back_populates="transaction")
