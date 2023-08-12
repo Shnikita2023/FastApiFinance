@@ -60,7 +60,7 @@ app.include_router(
 app.include_router(
     fastapi_users.get_users_router(UserRead, UserUpdate),
     prefix="/users",
-    tags=["users"],
+    tags=["Users"],
 )
 
 app.include_router(router_categories)

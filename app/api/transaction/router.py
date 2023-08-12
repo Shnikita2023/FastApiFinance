@@ -4,8 +4,6 @@ from fastapi_cache.decorator import cache
 
 from .shemas import TransactionCreate, TransactionGet
 from ..auth.base import current_user
-from ..balance.models import Balance
-from ..balance.router import get_balance_by_param
 from ..category.models import Category
 from ..category.router import get_item_by_param
 from ..balance.services import BalanceService
@@ -13,14 +11,13 @@ from ..depends.dependencies import UOWDep
 from ..transaction.services import TransactionService
 from ..users.models import User
 
-
 router_transaction = APIRouter(
     prefix="/transaction",
     tags=["transactions"]
 )
 
 
-@router_transaction.post("/add", summary='Добавление транзакции')
+@router_transaction.post("/", summary='Добавление транзакции')
 async def create_transaction(uow: UOWDep,
                              data_form: dict,
                              category: Category = Depends(get_item_by_param),
@@ -51,12 +48,29 @@ async def create_transaction(uow: UOWDep,
         })
 
 
-@router_transaction.get("/", summary='Получение всех транзакций пользователя', response_model=list[TransactionGet])
+@router_transaction.get("/{transaction_id}", summary='Получение транзакции пользователя по id',
+                        response_model=TransactionGet)
+async def get_one_transaction(uow: UOWDep,
+                              transaction_id: int,
+                              user: User = Depends(current_user)):
+    try:
+        one_transaction = await TransactionService().get_transaction(transaction_id, uow)
+        return one_transaction
+
+    except Exception:
+        raise HTTPException(status_code=500, detail={
+            "status": "error",
+            "data": None,
+            "details": "Ошибка получение транзакции"
+        })
+
+
+@router_transaction.get("/all", summary='Получение всех транзакций пользователя', response_model=list[TransactionGet])
 @cache(expire=600)
-async def get_transactions(uow: UOWDep,
-                           user: User = Depends(current_user),
-                           value: Optional[int] = None,
-                           param_column: str = "user_id"):
+async def get_all_transactions(uow: UOWDep,
+                               user: User = Depends(current_user),
+                               value: Optional[int] = None,
+                               param_column: str = "user_id"):
     try:
         if value is None:
             value = user.id
@@ -67,11 +81,11 @@ async def get_transactions(uow: UOWDep,
         raise HTTPException(status_code=500, detail={
             "status": "error",
             "data": None,
-            "details": None
+            "details": "Ошибка получение всех транзакций"
         })
 
 
-@router_transaction.delete("/", summary='Удаление транзакций пользователя')
+@router_transaction.delete("/{transaction_id}", summary='Удаление транзакции пользователя')
 async def delete_transaction(uow: UOWDep,
                              transaction_id: int,
                              user: User = Depends(current_user)) -> dict:

@@ -20,7 +20,7 @@ router_categories = APIRouter(
 )
 
 
-@router_categories.get("/get/{id_category}", summary='Получение категории по id', response_model=CategoryGet)
+@router_categories.get("/{id_category}", summary='Получение категории по id', response_model=CategoryGet)
 @cache(expire=60)
 async def get_category(id_category: int,
                        uow: UOWDep,
@@ -69,7 +69,7 @@ async def get_all_categories(uow: UOWDep,
         })
 
 
-@router_categories.post("/add", summary='Добавление категории')
+@router_categories.post("/", summary='Добавление категории')
 async def create_category(new_categorie: CategoryCreate,
                           uow: UOWDep,
                           user: User = Depends(current_user)):

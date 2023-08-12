@@ -34,3 +34,11 @@ class BalanceService:
             new_balance = await uow.balance.update_one(balance_id, new_data)
             await uow.commit()
             return new_balance
+
+    async def delete_balance(self,
+                             balance_id: int,
+                             uow: IUnitOfWork) -> int:
+        async with uow:
+            new_balance = await uow.balance.delete_one(balance_id)
+            await uow.commit()
+            return new_balance

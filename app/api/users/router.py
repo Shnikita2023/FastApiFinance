@@ -14,12 +14,12 @@ templates = Jinja2Templates(directory="app/api/templates")
 
 router_register = APIRouter(
     prefix="/register",
-    tags=["Regisration"]
+    tags=["Registrations"]
 )
 
 router_authentic = APIRouter(
     prefix="/authentic",
-    tags=["Authentication"]
+    tags=["Authentications"]
 )
 
 

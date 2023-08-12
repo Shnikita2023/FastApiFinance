@@ -40,7 +40,7 @@ async def create_balance_user(uow: UOWDep,
         })
 
 
-@router_balance.get("/get/{balance_id}", summary='Получение баланса пользователя', response_model=BalanceGet)
+@router_balance.get("/{balance_id}", summary='Получение баланса пользователя по id', response_model=BalanceGet)
 async def get_data_balance(uow: UOWDep,
                            balance_id: int,
                            user: User = Depends(current_user)) -> BalanceGet:
@@ -76,7 +76,7 @@ async def get_balance_by_param(uow: UOWDep,
         })
 
 
-@router_balance.patch("/{balance_id}", summary='Обновление баланса пользователя')
+@router_balance.patch("/{balance_id}", summary='Обновление баланса пользователя по id')
 async def update_total_balance(balance_id: int,
                                new_data: BalanceUpdate,
                                uow: UOWDep,
@@ -84,6 +84,26 @@ async def update_total_balance(balance_id: int,
     try:
         new_balance = await BalanceService().update_balance(balance_id, new_data.total_balance, uow)
         return new_balance
+
+    except Exception:
+        raise HTTPException(status_code=500, detail={
+            "status": "error",
+            "data": None,
+            "details": "Ошибка обновление баланса"
+        })
+
+
+@router_balance.delete("/{balance_id}", summary='Удаление баланса пользователя по id')
+async def delete_balance(balance_id: int,
+                         uow: UOWDep,
+                         user: User = Depends(current_user)) -> dict:
+    try:
+        id_balance = await BalanceService().delete_balance(balance_id, uow)
+        return {
+            "status": "successes",
+            "data": f"Баланс с id {id_balance} remove",
+            "details": None
+        }
 
     except Exception:
         raise HTTPException(status_code=500, detail={

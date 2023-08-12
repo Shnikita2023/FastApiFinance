@@ -25,9 +25,9 @@ class TransactionService:
             all_transaction = await uow.transaction.find_all()
             return all_transaction
 
-    async def get_transaction(self, id_category: int, uow: IUnitOfWork) -> TransactionGet:
+    async def get_transaction(self, transaction_id: int, uow: IUnitOfWork) -> TransactionGet:
         async with uow:
-            one_transaction = await uow.transaction.find_one(id_category)
+            one_transaction = await uow.transaction.find_one(transaction_id)
             return one_transaction
 
     async def get_transaction_by_param(self,
