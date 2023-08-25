@@ -18,6 +18,8 @@
 - PostgreSQL
 - Docker
 - Redis
+- Alembic
+- SQLAlchemy
 
 ## Разработка
 
