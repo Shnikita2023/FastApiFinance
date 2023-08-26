@@ -145,10 +145,10 @@ class SQLAlchemyRepository(AbstractRepository):
         except Exception as ex:
             raise f"Ошибка {ex}"
 
-    async def update_one(self, id_data: int, new_data: Any) -> dict:
+    async def update_one(self, id_data: int, new_data: Any) -> dict[str, str]:
         try:
             stmt = update(self.model).where(self.model.id == id_data).values(new_data)
-            res = await self.session.execute(stmt)
+            await self.session.execute(stmt)
             return new_data
 
         except ConnectionError:

@@ -11,13 +11,27 @@ from app.api.category.services import CategoryService
 from ..depends.dependencies import UOWDep
 from ..users.models import User
 
-
 templates = Jinja2Templates(directory="app/api/templates")
 
 router_categories = APIRouter(
     prefix="/category",
     tags=["Categories"]
 )
+
+
+@router_categories.get("/all", summary='Получение списка всех категорий', response_model=list[CategoryGet])
+async def get_all_categories(uow: UOWDep,
+                             user: User = Depends(current_user)) -> list[CategoryGet]:
+    try:
+        all_category: list[CategoryGet] = await CategoryService().get_categories(uow)
+        return all_category
+
+    except Exception:
+        raise HTTPException(status_code=500, detail={
+            "status": "error",
+            "data": None,
+            "details": "Ошибка получение всех категорий"
+        })
 
 
 @router_categories.get("/{id_category}", summary='Получение категории по id', response_model=CategoryGet)
@@ -54,27 +68,12 @@ async def get_item_by_param(value: Any,
         })
 
 
-@router_categories.get("/all", summary='Получение списка всех категорий', response_model=list[CategoryGet])
-async def get_all_categories(uow: UOWDep,
-                             user: User = Depends(current_user)) -> list[CategoryGet]:
-    try:
-        all_category: list[CategoryGet] = await CategoryService().get_categories(uow)
-        return all_category
-
-    except Exception:
-        raise HTTPException(status_code=500, detail={
-            "status": "error",
-            "data": None,
-            "details": "Ошибка получение всех категорий"
-        })
-
-
 @router_categories.post("/", summary='Добавление категории')
-async def create_category(new_categorie: CategoryCreate,
+async def create_category(new_category: CategoryCreate,
                           uow: UOWDep,
                           user: User = Depends(current_user)) -> dict:
     try:
-        category_id: int = await CategoryService().add_category(new_categorie, uow)
+        category_id: int = await CategoryService().add_category(new_category, uow)
         return {
             "status": "successes",
             "data": f"product с номером {category_id} added",
@@ -91,7 +90,8 @@ async def create_category(new_categorie: CategoryCreate,
 
 @router_categories.delete("/", summary='Удаление категории')
 async def delete_category(category_id: int,
-                          uow: UOWDep) -> dict:
+                          uow: UOWDep,
+                          user: User = Depends(current_user)) -> dict:
     try:
         await CategoryService().delete_category(category_id, uow)
         return {

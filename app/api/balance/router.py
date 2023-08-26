@@ -80,9 +80,17 @@ async def get_balance_by_param(uow: UOWDep,
 async def update_total_balance(balance_id: int,
                                new_data: BalanceUpdate,
                                uow: UOWDep,
-                               user: User = Depends(current_user)) -> dict:
+                               user: User = Depends(current_user)) -> dict[str, str]:
     try:
-        new_balance = await BalanceService().update_balance(balance_id, new_data.total_balance, uow)
+        balance_user: BalanceGet = await BalanceService().get_balance(balance_id=balance_id, uow=uow)
+        if not balance_user:
+            return {
+                "status": "error",
+                "data": "Ошибка получение баланса",
+                "details": None
+            }
+
+        new_balance: dict[str, str] = await BalanceService().update_balance(balance_id, new_data.total_balance, uow)
         return new_balance
 
     except Exception:

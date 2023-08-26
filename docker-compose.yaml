@@ -2,13 +2,31 @@ version: '3.9'
 
 services:
 
+  web_nginx:
+    container_name: "web"
+    image: nginx:alpine
+    depends_on:
+      - app
+    ports:
+      - "8000:80"
+    volumes:
+      - ./app/conf.d:/etc/nginx/conf.d
+    networks:
+      - custom
+
+
   app:
+    container_name: "app"
+    image: app
     build:
-      .
-    container_name:
-      app
+      context: .
+      dockerfile: Dockerfile
     env_file:
-      - .env
+      - .env.example
+    depends_on:
+      - database
+      - database_test
+      - redis_app_api
     networks:
       - custom
 
@@ -17,9 +35,12 @@ services:
     restart: always
     container_name: "database"
     env_file:
-      - .env
+      - .env.example
+    command: -p 5437
+    expose:
+        - 5437
     ports:
-      - "5436:5432"
+      - "5437:5437"
     networks:
       - custom
 
@@ -31,19 +52,25 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_DB=postgres_test
       - POSTGRES_PASSWORD=postgres
+    command: -p 5438
+    expose:
+      - 5438
     ports:
-      - "5435:5432"
+      - "5438:5438"
     networks:
       - custom
 
-  redis_app:
+  redis_app_api:
     image: redis
     restart: always
     env_file:
-      - .env
-    container_name: "redis_app"
+      - .env.example
+    container_name: "redis_app_api"
+    command: --port 6000
+    expose:
+        - 6000
     ports:
-      - "6000:6379"
+      - "6000:6000"
     networks:
       - custom
 

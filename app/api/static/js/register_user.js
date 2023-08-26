@@ -40,7 +40,7 @@ form.addEventListener('submit', event => {
             form.appendChild(successMessage);
             setTimeout(() => {
                 window.location.href = '/base'; // Переход на другую страницу
-            }, 5000); // Ждем 5 секунды, прежде чем перенаправить пользователя
+            }, 1000); // Ждем 5 секунды, прежде чем перенаправить пользователя
         })
   .catch((error) => console.log(`Ошибка запроса: ${error}`));
 });

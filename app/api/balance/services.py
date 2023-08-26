@@ -28,7 +28,7 @@ class BalanceService:
     async def update_balance(self,
                              balance_id: int,
                              new_data: float,
-                             uow: IUnitOfWork) -> dict:
+                             uow: IUnitOfWork) -> dict[str, str]:
         new_data = {"total_balance": new_data}
         async with uow:
             new_balance = await uow.balance.update_one(balance_id, new_data)

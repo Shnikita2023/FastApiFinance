@@ -10,6 +10,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         allCategory.appendChild(option)
                     })
                 })
+
+            .catch(error => console.log(`Ошибка: ${error}`));
 })
 
 
@@ -34,7 +36,7 @@ formFinance.addEventListener('submit', event => {
             "category": category
   }
 
-  fetch("http://127.0.0.1:8000/transaction/add?value=" + category, {
+  fetch("http://127.0.0.1:8000/transaction/", {
           method: "POST",
           headers: {
             "Content-Type": "application/json"
