@@ -2,12 +2,22 @@ version: '3.9'
 
 services:
 
+  app:
+    build:
+      .
+    container_name:
+      app
+    env_file:
+      - .env
+    networks:
+      - custom
+
   database:
     image: postgres
     restart: always
     container_name: "database"
     env_file:
-      - .env.example
+      - .env
     ports:
       - "5436:5432"
     networks:
@@ -30,7 +40,7 @@ services:
     image: redis
     restart: always
     env_file:
-      - .env.example
+      - .env
     container_name: "redis_app"
     ports:
       - "6000:6379"
