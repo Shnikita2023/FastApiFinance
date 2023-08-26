@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import Integer, ForeignKey, text, TIMESTAMP
+from sqlalchemy import ForeignKey, text, TIMESTAMP
 from sqlalchemy.orm import Mapped, mapped_column
 
 from sqlalchemy.orm import relationship
@@ -27,3 +27,4 @@ class Balance(Base):
             total_balance=self.total_balance,
             users_id=self.users_id
         )
+

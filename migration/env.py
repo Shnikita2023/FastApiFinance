@@ -12,7 +12,6 @@ from app.api.balance.models import *
 from app.api.transaction.models import *
 from app.api.users.models import *
 
-# sys.path.append(os.path.join(sys.path[0], 'app'))
 
 config = context.config
 section = config.config_ini_section

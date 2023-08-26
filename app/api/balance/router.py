@@ -14,18 +14,18 @@ router_balance = APIRouter(
 )
 
 
-@router_balance.post("/", summary='Создание баланса пользователя')
+@router_balance.post(path="/", summary='Создание баланса пользователя')
 async def create_balance_user(uow: UOWDep,
                               user: User = Depends(current_user)) -> dict:
     try:
-        balance_user = await BalanceService().get_balance_by_param(value=user.id, uow=uow)
+        balance_user: BalanceGet = await BalanceService().get_balance_by_param(value=user.id, uow=uow)
         if balance_user:
             return {
                 "status": "error",
                 "data": "У данного пользователя уже есть баланс",
                 "details": None
             }
-        balance_id = await BalanceService().add_balance(user.id, uow)
+        balance_id: int = await BalanceService().add_balance(user.id, uow)
         return {
             "status": "successes",
             "data": f"Баланс с id {balance_id} added",
@@ -45,7 +45,7 @@ async def get_data_balance(uow: UOWDep,
                            balance_id: int,
                            user: User = Depends(current_user)) -> BalanceGet:
     try:
-        one_balance = await BalanceService().get_balance(balance_id, uow)
+        one_balance: BalanceGet = await BalanceService().get_balance(balance_id, uow)
         return one_balance
 
     except Exception:
@@ -56,16 +56,16 @@ async def get_data_balance(uow: UOWDep,
         })
 
 
-@router_balance.get("/", summary='Получение баланса пользователя по любым параметрам',
+@router_balance.get(path="/", summary='Получение баланса пользователя по любым параметрам',
                     response_model=BalanceGet)
 async def get_balance_by_param(uow: UOWDep,
                                value: Optional[int] = None,
                                param_column: str = "users_id",
-                               user: User = Depends(current_user)):
+                               user: User = Depends(current_user)) -> BalanceGet:
     try:
         if value is None:
             value = user.id
-        one_balance = await BalanceService().get_balance_by_param(value, uow, param_column)
+        one_balance: BalanceGet = await BalanceService().get_balance_by_param(value, uow, param_column)
         return one_balance
 
     except Exception:
@@ -76,7 +76,7 @@ async def get_balance_by_param(uow: UOWDep,
         })
 
 
-@router_balance.patch("/{balance_id}", summary='Обновление баланса пользователя по id')
+@router_balance.patch(path="/{balance_id}", summary='Обновление баланса пользователя по id')
 async def update_total_balance(balance_id: int,
                                new_data: BalanceUpdate,
                                uow: UOWDep,

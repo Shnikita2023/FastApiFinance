@@ -24,9 +24,9 @@ router_categories = APIRouter(
 @cache(expire=60)
 async def get_category(id_category: int,
                        uow: UOWDep,
-                       user: User = Depends(current_user)):
+                       user: User = Depends(current_user)) -> CategoryGet:
     try:
-        one_category = await CategoryService().get_category(id_category, uow)
+        one_category: CategoryGet = await CategoryService().get_category(id_category, uow)
         return one_category
 
     except Exception:
@@ -41,9 +41,9 @@ async def get_category(id_category: int,
 async def get_item_by_param(value: Any,
                             uow: UOWDep,
                             param_column: str = "name",
-                            user: User = Depends(current_user)):
+                            user: User = Depends(current_user)) -> CategoryGet:
     try:
-        one_category = await CategoryService().get_category_by_param(param_column, value, uow)
+        one_category: CategoryGet = await CategoryService().get_category_by_param(param_column, value, uow)
         return one_category
 
     except Exception:
@@ -56,9 +56,9 @@ async def get_item_by_param(value: Any,
 
 @router_categories.get("/all", summary='Получение списка всех категорий', response_model=list[CategoryGet])
 async def get_all_categories(uow: UOWDep,
-                             user: User = Depends(current_user)):
+                             user: User = Depends(current_user)) -> list[CategoryGet]:
     try:
-        all_category = await CategoryService().get_categories(uow)
+        all_category: list[CategoryGet] = await CategoryService().get_categories(uow)
         return all_category
 
     except Exception:
@@ -72,9 +72,9 @@ async def get_all_categories(uow: UOWDep,
 @router_categories.post("/", summary='Добавление категории')
 async def create_category(new_categorie: CategoryCreate,
                           uow: UOWDep,
-                          user: User = Depends(current_user)):
+                          user: User = Depends(current_user)) -> dict:
     try:
-        category_id = await CategoryService().add_category(new_categorie, uow)
+        category_id: int = await CategoryService().add_category(new_categorie, uow)
         return {
             "status": "successes",
             "data": f"product с номером {category_id} added",

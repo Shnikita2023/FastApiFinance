@@ -5,6 +5,7 @@ from ..utils.unitofwork import IUnitOfWork
 
 
 class CategoryService:
+
     async def add_category(self, category: CategoryCreate, uow: IUnitOfWork) -> int:
         category_dict = category.dict()
         async with uow:

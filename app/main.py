@@ -1,3 +1,5 @@
+import os
+
 import uvicorn
 
 from fastapi import FastAPI, Request
@@ -21,11 +23,14 @@ from .api.transaction.router import router_transaction
 from .api.users.router import router_register, router_authentic
 from .api.users.shemas import UserRead, UserUpdate, UserCreate
 
+
 app = FastAPI()
 
 # Подключение статичных файлов
-app.mount("/static", StaticFiles(directory="app/api/static"), name="static")
+static_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "api/static"))
+app.mount("/static", StaticFiles(directory=static_dir), name="static")
 
+# Подключение шаблонов
 templates = Jinja2Templates(directory="app/api/templates")
 
 
@@ -71,7 +76,7 @@ app.include_router(router_transaction)
 app.include_router(router_tasks)
 
 origins = [
-    "http://127.0.0.1:8000/",
+    "http://0.0.0.0:8000/",
 ]
 
 app.add_middleware(

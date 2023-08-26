@@ -1,16 +1,13 @@
-from typing import Optional, Union
+from typing import Optional, Union, Any
 
 from fastapi import Depends, Request, HTTPException
 from fastapi_users import BaseUserManager, IntegerIDMixin, models, schemas
 
 from .utils import get_user_db
-from ..balance.services import BalanceService
-from ..depends.dependencies import UOWDep
 from ..users.shemas import UserCreate
 from ..users.models import User
 from ..utils.send_letter_on_email import send_password_reset_email, send_letter_on_after_register
 from app.config import SECRET_AUTH_RESET, SECRET_AUTH_VERIF_TOKEN
-
 
 
 class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
@@ -25,7 +22,6 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
     ) -> models.UP:
         """Регистрация пользователя"""
         await self.validate_password(user_create.password, user_create)
-
         existing_user = await self.user_db.get_by_email(user_create.email)
         if existing_user is not None:
             raise HTTPException(status_code=400,
@@ -39,9 +35,7 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
         password = user_dict.pop("password")
         user_dict["hashed_password"] = self.password_helper.hash(password)
         # Создание пользователя
-        created_user = await self.user_db.create(user_dict)
-        # Создание баланса
-        await BalanceService().add_balance(created_user.id, UOWDep())
+        created_user = await self.user_db.create(create_dict=user_dict)
 
         await self.on_after_register(created_user, request)
         return created_user

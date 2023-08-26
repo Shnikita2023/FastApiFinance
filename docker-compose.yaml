@@ -5,29 +5,38 @@ services:
   database:
     image: postgres
     restart: always
-    container_name: database
+    container_name: "database"
     env_file:
-      - .env
+      - .env.example
     ports:
-      - "5430:5432"
+      - "5436:5432"
+    networks:
+      - custom
 
   database_test:
     image: postgres
     restart: always
-    container_name: database_test
+    container_name: "database_test"
     environment:
-      POSTGRES_DB: "postgres"
-      POSTGRES_USER: "postgres"
-      POSTGRES_PASSWORD: "postgres"
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=postgres_test
+      - POSTGRES_PASSWORD=postgres
     ports:
-      - "5444:5432"
+      - "5435:5432"
+    networks:
+      - custom
 
-  redis:
+  redis_app:
     image: redis
     restart: always
     env_file:
-      - .env
-    container_name: redis_app
+      - .env.example
+    container_name: "redis_app"
     ports:
-      - "5378:6379"
+      - "6000:6379"
+    networks:
+      - custom
 
+networks:
+  custom:
+    driver: bridge

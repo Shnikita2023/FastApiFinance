@@ -1,16 +1,14 @@
 from abc import abstractmethod, ABC
-from typing import Type
 
 from ..balance.repository import BalanceRepository
 from ..category.repository import CategoryRepository
 from ..transaction.repository import TransactionRepository
-from ...db.database import async_session_maker
 
 
 class IUnitOfWork(ABC):
-    balance: Type[BalanceRepository]
-    category: Type[CategoryRepository]
-    transaction: Type[TransactionRepository]
+    balance: BalanceRepository
+    category: CategoryRepository
+    transaction: TransactionRepository
 
     @abstractmethod
     def __init__(self) -> None:
@@ -34,8 +32,8 @@ class IUnitOfWork(ABC):
 
 
 class UnitOfWork(IUnitOfWork):
-    def __init__(self) -> None:
-        self.session_factory = async_session_maker
+    def __init__(self, session_factory) -> None:
+        self.session_factory = session_factory
 
     async def __aenter__(self) -> None:
         self.session = self.session_factory()
@@ -53,4 +51,3 @@ class UnitOfWork(IUnitOfWork):
 
     async def rollback(self) -> None:
         await self.session.rollback()
-
