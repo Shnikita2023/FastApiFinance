@@ -1,9 +1,9 @@
-// Получаем форму по id
+
 const form = document.getElementById("form_register");
 
-
+// Функция регистрация пользователя
 form.addEventListener('submit', event => {
-  event.preventDefault();  // отменяем стандартное поведение формы
+  event.preventDefault();
 
   // Получаем данные формы
   const formData = new FormData(event.target);

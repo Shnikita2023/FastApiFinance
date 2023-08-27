@@ -60,12 +60,12 @@ services:
     networks:
       - custom
 
-  redis_app_api:
+  redis_app:
     image: redis
     restart: always
     env_file:
       - .env.example
-    container_name: "redis_app_api"
+    container_name: "redis_app"
     command: --port 6000
     expose:
         - 6000

@@ -1,3 +1,4 @@
+// Сброс пароля
 const form = document.getElementById('form_forgot');
 
 form.addEventListener('submit', event => {

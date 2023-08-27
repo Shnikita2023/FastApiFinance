@@ -17,24 +17,6 @@ const logoutUser = () => {
 
 };
 
-// Функция выбора категории вкладки "Мой кабинет"
-document.addEventListener('DOMContentLoaded', function() {
-    const accountButton = document.querySelector('.account-button');
-    const dropdownContent = document.querySelector('.dropdown-content');
-
-    accountButton.addEventListener('click', function() {
-        dropdownContent.classList.toggle('show');
-    });
-
-    window.addEventListener('click', function(event) {
-        if (!event.target.matches('.account-button')) {
-            if (dropdownContent.classList.contains('show')) {
-                dropdownContent.classList.remove('show');
-            }
-        }
-    });
-})
-
 
 // Получение баланса пользователя с БД и вывод на экран
 const myBalance = () => {
@@ -58,23 +40,24 @@ const myBalance = () => {
 };
 
 
-
-
-// Отправка обновленных данных пользователя
+// Отправка обновленных данных пользователя на сервер
 const editButton = document.querySelector('.edit-button');
 const modal = document.querySelector('#modal');
 const closeButton = document.querySelector('.close');
 const editForm = document.querySelector('#edit-form');
 
-editButton.addEventListener('click', () => {
+// Функция отображения модального окна
+function showModal() {
     modal.style.display = 'block';
-});
+}
 
-closeButton.addEventListener('click', () => {
-modal.style.display = 'none';
-});
+// Функция закрытия модального окна
+function closeModal() {
+   modal.style.display = 'none';
+}
 
-editForm.addEventListener('submit', (e) => {
+// Функция обработки отправки формы
+function handleSubmit(e) {
     e.preventDefault();
 
     const firstName = document.querySelector('#first-name').value;
@@ -83,34 +66,39 @@ editForm.addEventListener('submit', (e) => {
     const userName = document.querySelector('#username').value;
     const password = document.querySelector('#password').value;
 
-    const newDataUser = {
-              "email": email,
-              "password": password,
-              "username": userName,
-              "last_name": lastName,
-              "first_name": firstName,
-    }
+        const newDataUser = {
+            "email": email,
+            "password": password,
+            "username": userName,
+            "last_name": lastName,
+            "first_name": firstName,
+        };
 
-    // Отправка обновлённых данных в БД
+        // Отправка обновлённых данных в БД
     fetch('http://127.0.0.1:8000/users/me', {
         method: 'PATCH',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify(newDataUser),
     })
         .then((response) => {
-             if(response.status == 200) {  // если ответ не содержит ошибку
-                   alert('Данные успешно отправлены и сохранены')
-                   modal.style.display = 'none';
-             } else {
-                    console.log(response)
-                    response.json()
-                       .then(data => {
-                             const errorMessage = data.detail
-                             alert(errorMessage)
-                       })
-             }
+            if(response.status == 200) {  // если ответ не содержит ошибку
+                alert('Данные успешно отправлены и сохранены');
+                modal.style.display = 'none';
+            } else {
+                console.log(response);
+                response.json()
+                    .then(data => {
+                        const errorMessage = data.detail;
+                        alert(errorMessage);
+                    });
+            }
         })
-       .catch((error) => {
-                console.error('Ошибка при отправке данных:', error);
-       });
-});
+        .catch((error) => {
+            console.error('Ошибка при отправке данных:', error);
+        });
+}
+
+// Добавление обработчиков событий
+editButton.addEventListener('click', showModal);
+closeButton.addEventListener('click', closeModal);
+editForm.addEventListener('submit', handleSubmit);

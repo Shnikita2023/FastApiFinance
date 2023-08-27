@@ -1,5 +1,6 @@
 const form = document.getElementById('form_reset');
 
+// Функция сброса пароля
 form.addEventListener('submit', event => {
     event.preventDefault();
 

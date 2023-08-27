@@ -25,8 +25,8 @@ formFinance.addEventListener('submit', event => {
   const formData = new FormData(event.target) // Создаём новую форму с помощью метода event
   const amount = formData.get('amount')
   const category = formData.get('category')
-  const description = formData.get('comment')
-  const type = formData.get('type_transaction')
+  const comment = formData.get('comment')
+  const type_transaction = formData.get('type_transaction')
 
 
   data_expense = {
@@ -36,7 +36,7 @@ formFinance.addEventListener('submit', event => {
             "category": category
   }
 
-  fetch("http://127.0.0.1:8000/transaction/", {
+  fetch("/transaction/formation", {
           method: "POST",
           headers: {
             "Content-Type": "application/json"
@@ -51,4 +51,5 @@ formFinance.addEventListener('submit', event => {
     .catch(error => console.log(`Ошибка: ${error}`));
 
 })
+
 

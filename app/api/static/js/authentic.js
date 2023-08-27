@@ -1,3 +1,4 @@
+// Аутентификация пользователя
 const form = document.getElementById('form_auth');
 form.addEventListener('submit', event => {
        event.preventDefault();

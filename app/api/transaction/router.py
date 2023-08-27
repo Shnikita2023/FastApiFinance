@@ -1,9 +1,14 @@
 from typing import Optional
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi_cache.decorator import cache
+from httpx import AsyncClient
 
 from .shemas import TransactionCreate, TransactionGet
 from ..auth.base import current_user
+from ..balance.services import BalanceService
+from ..balance.shemas import BalanceGet
+from ..category.services import CategoryService
+from ..category.shemas import CategoryGet
 from ..depends.dependencies import UOWDep
 from ..transaction.services import TransactionService
 from ..users.models import User
@@ -35,7 +40,8 @@ async def create_transaction(uow: UOWDep,
         })
 
 
-@router_transaction.get(path="/all", summary='Получение всех транзакций пользователя', response_model=list[TransactionGet])
+@router_transaction.get(path="/all", summary='Получение всех транзакций пользователя',
+                        response_model=list[TransactionGet])
 @cache(expire=600)
 async def get_all_transactions(uow: UOWDep,
                                user: User = Depends(current_user),
@@ -91,3 +97,28 @@ async def delete_transaction(uow: UOWDep,
             "data": None,
             "details": "Ошибка удаление транзакций"
         })
+
+
+@router_transaction.post(path="/formation", summary='Подготовка транзакции')
+async def formation_transaction(data_transaction: dict[str, str],
+                                request: Request,
+                                uow: UOWDep,
+                                user: User = Depends(current_user)):
+    """Формирование транзакции для её создание"""
+    try:
+        one_category: CategoryGet = await CategoryService().get_category_by_param(data_transaction["category"], uow)
+        one_balance: BalanceGet = await BalanceService().get_balance_by_param(user.id, uow)
+        user_id: int = user.id
+        new_transaction: TransactionCreate = TransactionCreate(comment=data_transaction["comment"],
+                                                               amount=data_transaction["amount"],
+                                                               type_transaction=data_transaction["type_transaction"],
+                                                               user_id=user_id,
+                                                               category_id=one_category.id,
+                                                               balance_id=one_balance.id)
+        async with AsyncClient() as client:
+            cookie: dict[str, str] = request.cookies
+            URL: str = "http://localhost:8000/transaction/"
+            await client.post(url=URL, json=new_transaction.dict(), cookies=cookie)
+
+    except Exception as ex:
+        raise HTTPException(status_code=500, detail=f"Ошибка отправки транзакции")
