@@ -26,7 +26,7 @@ services:
     depends_on:
       - database
       - database_test
-      - redis_app_api
+      - redis_app
     networks:
       - custom
 
