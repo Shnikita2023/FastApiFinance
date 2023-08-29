@@ -10,7 +10,7 @@ const logoutUser = () => {
     )
     .then(response => {
         if(response.status == 204) {
-            return window.location.href = '/base/'
+            return window.location.href = 'http://127.0.0.1:8000/base'
         }
     })
     .catch(error => console.log(`Ошибка: ${error}`))

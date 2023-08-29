@@ -117,8 +117,14 @@ async def formation_transaction(data_transaction: dict[str, str],
                                                                balance_id=one_balance.id)
         async with AsyncClient() as client:
             cookie: dict[str, str] = request.cookies
-            URL: str = "http://localhost:8000/transaction/"
+            URL: str = "http://127.0.0.1:8000/transaction/"
             await client.post(url=URL, json=new_transaction.dict(), cookies=cookie)
+
+        return {
+            "status": "successes",
+            "data": data_transaction["comment"],
+            "details": f"transaction wit comment {data_transaction['comment']} added"
+        }
 
     except Exception as ex:
         raise HTTPException(status_code=500, detail=f"Ошибка отправки транзакции")

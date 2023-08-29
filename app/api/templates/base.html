@@ -4,7 +4,7 @@
     <title>Управление финансами</title>
     {% block head %}
     <!-- Подключаем CSS-файл -->
-    <link rel="stylesheet" href="{{ url_for('static', path='css/base.css') }}">
+    <link rel="stylesheet" href="/static/css/base.css">
     {% endblock %}
 </head>
 
@@ -21,7 +21,7 @@
     </header>
 
 <!-- Подключаем JS-файлы -->
-<script src="{{ url_for('static', path='js/auth.js') }}"></script>
+<script src="/static/js/auth.js"></script>
 {% endblock %}
 </body>
 </html>

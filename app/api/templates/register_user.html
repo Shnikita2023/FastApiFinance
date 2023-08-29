@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block head %}
-<link rel="stylesheet" href="{{ url_for('static', path='css/style.css') }}">
+<link rel="stylesheet" href="/static/css/style.css">
 {% endblock %}
 
 {% block content %}
@@ -26,5 +26,5 @@
 </main>
 
 <!-- Подключаем JS-файлы -->
-<script src="{{ url_for('static', path='js/register_user.js') }}"></script>
+<script src="/static/js/register_user.js"></script>
 {% endblock %}

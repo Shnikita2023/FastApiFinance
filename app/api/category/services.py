@@ -24,9 +24,9 @@ class CategoryService:
             return one_category
 
     async def get_category_by_param(self,
-                                    param_column: str,
                                     value: Any,
-                                    uow: IUnitOfWork) -> CategoryGet:
+                                    uow: IUnitOfWork,
+                                    param_column: str = "name") -> CategoryGet:
         async with uow:
             one_category = await uow.category.find_by_param(param_column, value)
             return one_category[0]
