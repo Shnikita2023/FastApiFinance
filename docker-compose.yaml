@@ -23,7 +23,7 @@ services:
       context: .
       dockerfile: Dockerfile
     env_file:
-      - .env
+      - .env.example
     depends_on:
       - database
       - database_test
@@ -36,7 +36,7 @@ services:
     restart: always
     container_name: "database"
     env_file:
-      - .env
+      - .env.example
     command: -p 5437
     expose:
         - 5437
@@ -65,7 +65,7 @@ services:
     image: redis
     restart: always
     env_file:
-      - .env
+      - .env.example
     container_name: "redis_app"
     command: --port 6000
     expose:
