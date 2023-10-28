@@ -3,4 +3,4 @@ up:
 
 
 down:
-	docker compose -f docker-compose.yaml down && docker network prune -f
+	docker compose -f docker-compose.yaml down --remove-orphans && docker volume prune -f

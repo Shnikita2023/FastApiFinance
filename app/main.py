@@ -13,6 +13,7 @@ from redis import asyncio as aioredis
 from starlette.responses import HTMLResponse
 from starlette.staticfiles import StaticFiles
 from starlette.templating import Jinja2Templates
+from starlette_exporter import handle_metrics, PrometheusMiddleware
 
 from .config import REDIS_HOST, REDIS_PORT
 from .api.auth.base import fastapi_users, auth_backend
@@ -23,13 +24,11 @@ from .api.transaction.router import router_transaction
 from .api.users.router import router_register, router_authentic
 from .api.users.shemas import UserRead, UserUpdate, UserCreate
 
-
 app = FastAPI()
 
 # Подключение статичных файлов
 static_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "api/static"))
 app.mount("/static", StaticFiles(directory=static_dir), name="static")
-
 
 # Подключение шаблонов
 templates = Jinja2Templates(directory="app/api/templates")
@@ -75,6 +74,10 @@ app.include_router(router_authentic)
 app.include_router(router_balance)
 app.include_router(router_transaction)
 app.include_router(router_tasks)
+
+app.add_route("/metrics", handle_metrics)
+
+app.add_middleware(PrometheusMiddleware)
 
 origins = [
     "http://0.0.0.0:8000/",

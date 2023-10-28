@@ -11,7 +11,7 @@ services:
       - "8000:80"
     volumes:
       - ./app/conf.d:/etc/nginx/conf.d
-      - ./app/api/static:/fastapi_app/app/api/static
+      - ./app/api/static:/fastapi_app/app/api/static  
     networks:
       - custom
 
@@ -27,7 +27,7 @@ services:
     depends_on:
       - database
       - database_test
-      - redis_app_fi
+      - redis_app
     networks:
       - custom
 
@@ -37,11 +37,8 @@ services:
     container_name: "database"
     env_file:
       - .env.example
-    command: -p 5437
-    expose:
-        - 5437
     ports:
-      - "5437:5437"
+      - "5451:5432"
     networks:
       - custom
 
@@ -51,13 +48,10 @@ services:
     container_name: "database_test"
     environment:
       - POSTGRES_USER=postgres
-      - POSTGRES_DB=postgres_test
+      - POSTGRES_DB=finance_db_test
       - POSTGRES_PASSWORD=postgres
-    command: -p 5438
-    expose:
-      - 5438
     ports:
-      - "5438:5438"
+      - "5452:5433"
     networks:
       - custom
 
@@ -67,14 +61,44 @@ services:
     env_file:
       - .env.example
     container_name: "redis_app"
-    command: --port 6000
-    expose:
-        - 6000
     ports:
-      - "6000:6000"
+      - "6000:6379"
+    networks:
+      - custom
+
+  prometheus:
+    image: prom/prometheus
+    restart: always
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus-data:/prometheus
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+    depends_on:
+      - app
+    networks:
+      - custom
+
+  grafana:
+    image: grafana/grafana
+    restart: always
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - grafana-config:/etc/grafana
+    depends_on:
+      - prometheus
     networks:
       - custom
 
 networks:
   custom:
     driver: bridge
+
+volumes:
+  grafana-data:
+  grafana-config:
+  prometheus-data:

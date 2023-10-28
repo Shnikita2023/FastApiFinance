@@ -24,7 +24,10 @@
 - Redis
 - Alembic
 - SQLAlchemy
-- nginx
+- Nginx
+- Grafana
+- Prometheus
+- Starlette_exporter
 
 ## Разработка
 
